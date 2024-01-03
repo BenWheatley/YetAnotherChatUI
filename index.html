@@ -104,14 +104,14 @@
 <body>
 
 	<div id="chats-container">
-		<h2>Chats</h2>
+		<h2>Chats (stored locally)</h2>
 		<!-- List of chats (left column) will be populated dynamically -->
 		<table id="chats">
 		</table>
 	</div>
 
 	<div id="chatSession">
-		<h2>Chat Session</h2>
+		<h2>Chat Session (stored locally)</h2>
 		<div class="group">
 			<h3>Settings</h3>
 			<button class="hideButton" onclick="toggleSettings();">▲</button>
@@ -120,6 +120,10 @@
 				<tr>
 					<td class="label-col"><label for="apiKey">API Key:</label></td>
 					<td class="input-col"><input type="text" id="apiKey" placeholder="Enter API Key"></td>
+				</tr>
+				<tr>
+					<td class="label-col"><label for="apiEndpoint">API endpoint:</label></td>
+					<td class="input-col"><input type="text" id="apiEndpoint" placeholder="https://api.openai.com/v1/chat/completions"></td>
 				</tr>
 				<tr>
 					<td class="label-col"><label for="model">Model:</label></td>
@@ -166,6 +170,17 @@
 			button.innerHTML = settings.classList.contains('hidden') ? '▼' : '▲';
 		}
 		
+		function saveApiKeyToStorage() {
+			var apiKeyValue = document.getElementById('apiKey').value;
+			localStorage.setItem('apiKey', apiKeyValue);
+		}
+
+		function initializeApiKeyFromStorage() {
+			var apiKeyInput = document.getElementById('apiKey');
+			var savedApiKey = localStorage.getItem('apiKey');
+			if (savedApiKey) { apiKeyInput.value = savedApiKey; }
+		}
+		
 		function sendMessage() {
 			var userMessage = document.getElementById("userMessage").value;
 			// Perform API call and update chat table (replace with actual logic)
@@ -207,7 +222,15 @@
 		}
 
 		// Call the function to load chats when the page loads
-		window.onload = loadAllChatsFromStorage;
+		window.onload = function () {
+			loadAllChatsFromStorage();
+
+			// API key:
+			initializeApiKeyFromStorage();
+			// Add an event listener to the input to save the API key when modified
+			var apiKeyInput = document.getElementById('apiKey');
+			apiKeyInput.addEventListener('input', saveApiKeyToStorage);
+		};
 
 	</script>
 </body>
