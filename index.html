@@ -155,10 +155,6 @@
 	</div>
 
 	<script>
-		function loadAllChatsFromStorage() {
-			// populate <table id="chats"> from localStorage item "chats", which is array of chatObject, each chatObject has a date, a title, and content, the table renders each title in date order, and when the row is clicked on will call the function "loadChat(chatObject)"
-		}
-		
 		function toggleSettings() {
 			var settings = document.getElementById('settings');
 			settings.classList.toggle('hidden');
@@ -175,6 +171,44 @@
 			// Perform API call and update chat table (replace with actual logic)
 			console.log("User Message:", userMessage);
 		}
+		
+		function loadAllChatsFromStorage() {
+			// Get the chats data from localStorage
+			var chatsData = JSON.parse(localStorage.getItem("chats")) || [];
+
+			// Sort chats by date in descending order
+			chatsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+			// Get the table element
+			var chatsTable = document.getElementById("chats");
+
+			// Clear existing rows in the table
+			chatsTable.innerHTML = "";
+
+			// Iterate through each chat object and append a row to the table
+			chatsData.forEach(chat => {
+				var row = chatsTable.insertRow();
+				var cell = row.insertCell(0);
+				cell.textContent = chat.title;
+				row.addEventListener("click", function() {
+					loadChat(chat);
+				});
+			});
+		}
+		
+		function saveChatToStorage() {
+			
+		}
+
+		// Example function to load a specific chat
+		function loadChat(chatObject) {
+			// Your logic to load the chat goes here
+			console.log("Loading chat:", chatObject.title);
+		}
+
+		// Call the function to load chats when the page loads
+		window.onload = loadAllChatsFromStorage;
+
 	</script>
 </body>
 </html>
