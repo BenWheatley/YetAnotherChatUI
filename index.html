@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Chat Session UI</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+			display: flex;
+		}
+
+		#chats-container {
+			width: 20em;
+			padding: 20px;
+			background-color: #f2f2f2;
+			overflow-y: auto;
+		}
+
+		#chatSession {
+			flex: 1;
+			padding: 20px;
+		}
+		
+		h2 {
+			margin-top: 0px;
+		}
+		
+		.group {
+			position: relative;
+			border: 1px solid #ccc;
+			padding: 10px;
+			overflow: hidden;
+		}
+		
+		.group h3 {
+			margin: 0;
+			height: 29px;
+		}
+		
+		.hidden {
+			display: none;
+		}
+		
+		.form-table {
+			width: 100%;
+		}
+
+		.form-table td {
+			padding: 5px;
+		}
+
+		.form-table .label-col {
+			text-align: right;
+			width: 1px; /* Weirdly, this doesn't actually limit it to 1px */
+			white-space: nowrap;
+		}
+
+		.form-table .input-col {
+			text-align: left;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-bottom: 20px;
+		}
+
+		th, td {
+			padding: 10px;
+			border: 1px solid #ddd;
+			text-align: left;
+		}
+
+		th {
+			background-color: #4CAF50;
+			color: white;
+		}
+
+		input[type="text"] {
+			padding: 8px;
+			width: 80%;
+			margin-right: 10px;
+		}
+
+		.hideButton {
+			position: absolute;
+			top: 0;
+			right: 0;
+			margin: 10px;
+		}
+
+		button {
+			padding: 8px;
+			background-color: #4CAF50;
+			color: white;
+			border: none;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="chats-container">
+		<h2>Chats</h2>
+		<!-- List of chats (left column) will be populated dynamically -->
+		<table id="chats">
+		</table>
+	</div>
+
+	<div id="chatSession">
+		<h2>Chat Session</h2>
+		<div class="group">
+			<h3>Settings</h3>
+			<button class="hideButton" onclick="toggleSettings();">▲</button>
+			
+			<table class="form-table" id="settings">
+				<tr>
+					<td class="label-col"><label for="apiKey">API Key:</label></td>
+					<td class="input-col"><input type="text" id="apiKey" placeholder="Enter API Key"></td>
+				</tr>
+				<tr>
+					<td class="label-col"><label for="model">Model:</label></td>
+					<td class="input-col"><input type="text" id="model" placeholder="gpt-4-1106-preview"></td>
+				</tr>
+				<tr>
+					<td class="label-col"><label for="temperature">Temperature:</label></td>
+					<td class="input-col"><input type="number" id="temperature" step="0.1" placeholder="1"></td>
+				</tr>
+				<tr>
+					<td class="label-col"><label for="maxTokens">Max Tokens:</label></td>
+					<td class="input-col"><input type="number" id="maxTokens" placeholder="256"></td>
+				</tr>
+				<tr>
+					<td class="label-col"><label for="topP">Top P:</label></td>
+					<td class="input-col"><input type="number" id="topP" step="0.1" placeholder="1"></td>
+				</tr>
+				<tr>
+					<td class="label-col"><label for="frequencyPenalty">Frequency Penalty:</label></td>
+					<td class="input-col"><input type="number" id="frequencyPenalty" step="0.1" placeholder="0"></td>
+				</tr>
+				<tr>
+					<td class="label-col"><label for="presencePenalty">Presence Penalty:</label></td>
+					<td class="input-col"><input type="number" id="presencePenalty" step="0.1" placeholder="0"></td>
+				</tr>
+			</table>
+		</div>
+
+		<table id="chatTable"></table>
+
+		<input type="text" id="userMessage" placeholder="Type your message...">
+		<button onclick="sendMessage()">Enter</button>
+	</div>
+
+	<script>
+		function loadAllChatsFromStorage() {
+			// populate <table id="chats"> from localStorage item "chats", which is array of chatObject, each chatObject has a date, a title, and content, the table renders each title in date order, and when the row is clicked on will call the function "loadChat(chatObject)"
+		}
+		
+		function toggleSettings() {
+			var settings = document.getElementById('settings');
+			settings.classList.toggle('hidden');
+
+			// Get the button element
+			var button = document.querySelector('.hideButton');
+
+			// Update button content based on the state of the settings element
+			button.innerHTML = settings.classList.contains('hidden') ? '▼' : '▲';
+		}
+		
+		function sendMessage() {
+			var userMessage = document.getElementById("userMessage").value;
+			// Perform API call and update chat table (replace with actual logic)
+			console.log("User Message:", userMessage);
+		}
+	</script>
+</body>
+</html>
