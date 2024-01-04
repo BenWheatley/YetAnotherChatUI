@@ -11,14 +11,14 @@
 			padding: 0;
 			display: flex;
 		}
-
+		
 		#chats-container {
 			width: 20em;
 			padding: 20px;
 			background-color: #f2f2f2;
 			overflow-y: auto;
 		}
-
+		
 		#chatSession {
 			flex: 1;
 			padding: 20px;
@@ -47,51 +47,63 @@
 		.form-table {
 			width: 100%;
 		}
-
+		
 		.form-table td {
 			padding: 5px;
 		}
-
-		.form-table .label-col {
+		
+		.label-col {
 			text-align: right;
 			width: 1px; /* Weirdly, this doesn't actually limit it to 1px */
 			white-space: nowrap;
 		}
-
-		.form-table .input-col {
+		
+		.input-col {
 			text-align: left;
 		}
-
+		
 		table {
 			width: 100%;
 			border-collapse: collapse;
 			margin-bottom: 20px;
 		}
-
+		
 		th, td {
 			padding: 10px;
 			border: 1px solid #ddd;
 			text-align: left;
 		}
-
+		
 		th {
 			background-color: #4CAF50;
 			color: white;
 		}
-
+		
+		.system::before {
+			content: "\1F4AD"; /* Thought Bubble Emoji */
+		}
+		
+		.user::before {
+			content: "\1F9D1"; /* Gender Neutral Person Emoji */
+		}
+		
+		.assistant::before {
+			content: "\1F916"; /* Robot Emoji */
+		}
+		
 		input[type="text"] {
 			padding: 8px;
 			width: 80%;
 			margin-right: 10px;
 		}
-
+		
 		.hideButton {
 			position: absolute;
 			top: 0;
 			right: 0;
 			margin: 10px;
 		}
-
+		
 		button {
 			padding: 8px;
 			background-color: #4CAF50;
@@ -102,14 +114,14 @@
 	</style>
 </head>
 <body>
-
+	
 	<div id="chats-container">
 		<h2>Chats (stored locally)</h2>
 		<!-- List of chats (left column) will be populated dynamically -->
 		<table id="chats">
 		</table>
 	</div>
-
+	
 	<div id="chatSession">
 		<h2>Chat Session (stored locally)</h2>
 		<div class="group">
@@ -149,23 +161,27 @@
 					<td class="label-col"><label for="presencePenalty">Presence Penalty:</label></td>
 					<td class="input-col"><input type="number" id="presencePenalty" step="0.1" placeholder="0"></td>
 				</tr>
+				<tr>
+					<td class="label-col"><label for="systemMessage">System message:</label></td>
+					<td class="input-col"><input type="text" id="systemMessage" placeholder="You are a helpful assistant."></td>
+				</tr>
 			</table>
 		</div>
-
+		
 		<table id="chatTable"></table>
-
+		
 		<input type="text" id="userMessage" placeholder="Type your message...">
 		<button onclick="sendMessage()">Enter</button>
 	</div>
-
+	
 	<script>
 		function toggleSettings() {
 			var settings = document.getElementById('settings');
 			settings.classList.toggle('hidden');
-
+			
 			// Get the button element
 			var button = document.querySelector('.hideButton');
-
+			
 			// Update button content based on the state of the settings element
 			button.innerHTML = settings.classList.contains('hidden') ? '▼' : '▲';
 		}
@@ -174,32 +190,133 @@
 			var apiKeyValue = document.getElementById('apiKey').value;
 			localStorage.setItem('apiKey', apiKeyValue);
 		}
-
+		
 		function initializeApiKeyFromStorage() {
 			var apiKeyInput = document.getElementById('apiKey');
-			var savedApiKey = localStorage.getItem('apiKey');
-			if (savedApiKey) { apiKeyInput.value = savedApiKey; }
+			apiKeyInput.value = localStorage.getItem('apiKey') || '';
 		}
 		
 		function sendMessage() {
-			var userMessage = document.getElementById("userMessage").value;
-			// Perform API call and update chat table (replace with actual logic)
-			console.log("User Message:", userMessage);
+			// Get API key or fast fail
+			var apiKeyInput = document.getElementById('apiKey').value;
+			if (apiKeyInput == null) { return; }
+			
+			// Get the user's message from the input field
+			var newUserMessageString = document.getElementById("userMessage").value;
+			if (newUserMessageString == null) {
+				return; // don't waste calls (though I may want to experiment with this later)
+			}
+			
+			// Create a new message object for the user and append to existing messages
+			var newUserMessage = {
+				"role": "user",
+				"content": newUserMessageString
+			};
+			if (document.currentChatObject == null) { makeInitialChatObject(); }
+			var existingMessages = document.currentChatObject.messages;
+			var allMessages = existingMessages.concat(newUserMessage);
+			
+			var apiEndpoint = extractFrom("apiEndpoint", String);
+			makeAPIRequest(apiEndpoint, apiKeyInput, buildJSON(allMessages))
+				.then(response => {
+					var firstChoice = response.choices[0]; // This could change, but I don't see a good UI for it
+					console.log(firstChoice);
+					allMessages.push(firstChoice.message);
+					console.log(`before: ${document.currentChatObject.messages}`);
+					document.currentChatObject.messages = allMessages;
+					console.log(`after: ${document.currentChatObject.messages}`);
+					renderChatMessages(allMessages);
+				})
+				.catch(error => {
+					alert(`Error: ${error}`);
+				});
+		}
+		
+		function buildJSON(allMessages) {
+			// Get values from UI
+			var userModel = extractFrom("model", String) || "";
+			var userTemperature = extractFrom("temperature", parseFloat) || 1;
+			var userMaxTokens = extractFrom("maxTokens", parseInt) || 256;
+			var userTopP = extractFrom("topP", parseFloat) || 1;
+			var userFrequencyPenalty = extractFrom("frequencyPenalty", parseFloat) || 0;
+			var userPresencePenalty = extractFrom("presencePenalty", parseFloat) || 0;
+			
+			if (allMessages.length === 0 || allMessages[0].role !== "system") {
+				var systemMessage = extractFrom("systemMessage", String) || "";
+				var systemMessage = {
+					"role": "system",
+					"content": systemMessage
+				};
+				allMessages.unshift(systemMessage);
+			}
+			
+			var jsonToSend = {
+				"model": userModel,
+				"messages": allMessages,
+				"temperature": userTemperature,
+				"max_tokens": userMaxTokens,
+				"top_p": userTopP,
+				"frequency_penalty": userFrequencyPenalty,
+				"presence_penalty": userPresencePenalty
+			};
+			
+			return jsonToSend;
+		}
+		
+		async function makeAPIRequest(url, apiKey, jsonData) {
+			const requestOptions = {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${apiKey}`
+				},
+				body: JSON.stringify(jsonData)
+			};
+			
+			try {
+				const response = await fetch(url, requestOptions);
+				const result = await response.json();
+				console.log('Response from API:', result);
+				return result;
+				
+			} catch (error) {
+				console.error('Error making API request:', error);
+				throw error;
+			}
+		}
+		
+		function extractFrom(elementId, parser) {
+			var element = document.getElementById(elementId);
+			var value = element.value || element.placeholder;
+			return parser(value);
+		}
+		
+		function makeInitialChatObject() {
+			document.currentChatObject = {
+				'apiEndpoint': "",
+				'model': '',
+				'temperature': '',
+				'maxTokens': '',
+				'topP': '',
+				'frequencyPenalty': '',
+				'presencePenalty': '',
+				'messages': []
+			};
 		}
 		
 		function loadAllChatsFromStorage() {
 			// Get the chats data from localStorage
 			var chatsData = JSON.parse(localStorage.getItem("chats")) || [];
-
+			
 			// Sort chats by date in descending order
 			chatsData.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+			
 			// Get the table element
 			var chatsTable = document.getElementById("chats");
-
+			
 			// Clear existing rows in the table
 			chatsTable.innerHTML = "";
-
+			
 			// Iterate through each chat object and append a row to the table
 			chatsData.forEach(chat => {
 				var row = chatsTable.insertRow();
@@ -211,20 +328,50 @@
 			});
 		}
 		
-		function saveChatToStorage() {
+		function saveChatToStorage(chatObject) {
 			
 		}
-
-		// Example function to load a specific chat
+		
 		function loadChat(chatObject) {
-			// Your logic to load the chat goes here
-			console.log("Loading chat:", chatObject.title);
+			saveChatToStorage(document.currentChatObject);
+			
+			document.currentChatObject = chatObject;
+			
+			// load metadata
+			document.getElementById('apiEndpoint').value = chatObject.apiEndpoint || '';
+			
+			document.getElementById('model').value = chatObject.model || '';
+			document.getElementById('temperature').value = chatObject.temperature || '';
+			document.getElementById('maxTokens').value = chatObject.maxTokens || '';
+			document.getElementById('topP').value = chatObject.topP || '';
+			document.getElementById('frequencyPenalty').value = chatObject.frequencyPenalty || '';
+			document.getElementById('presencePenalty').value = chatObject.presencePenalty || '';
+			
+			renderChatMessages(chatObject.messages);
 		}
-
+		
+		function renderChatMessages(messages) {
+			var chatTable = document.getElementById("chatTable");
+			
+			// Clear existing rows in the table
+			chatTable.innerHTML = "";
+			
+			// Iterate through each message object and append a row to the table
+			messages.forEach(message => {
+				var row = chatTable.insertRow();
+				var roleCell = row.insertCell(0);
+				roleCell.classList.add(message.role);
+				roleCell.classList.add("label-col");
+				var contentCell = row.insertCell(1);
+				contentCell.className = "input-col";
+				contentCell.textContent = message.content;
+			});
+		}
+		
 		// Call the function to load chats when the page loads
 		window.onload = function () {
 			loadAllChatsFromStorage();
-
+			
 			// API key:
 			initializeApiKeyFromStorage();
 			// Add an event listener to the input to save the API key when modified
