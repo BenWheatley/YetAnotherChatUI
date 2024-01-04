@@ -111,6 +111,24 @@
 			border: none;
 			cursor: pointer;
 		}
+		
+		.waiting-spinner {
+			content: "";
+			background-color: #0000;
+			color: #0000;
+			border: 4px solid #4CAF5080;
+			border-radius: 50%;
+			border-top: 4px solid #4CAF50;
+			border-bottom: 4px solid #4CAF50;
+			width: 16px;
+			height: 16px;
+			animation: spin 1s linear infinite;
+		}
+		
+		@keyframes spin {
+			from {	transform: rotate(0deg);	}
+			to {	transform: rotate(360deg);	}
+		}
 	</style>
 </head>
 <body>
@@ -123,6 +141,12 @@
 	</div>
 	
 	<div id="chatSession">
+		<div>
+			<h2>GDPR stuff</h2>
+			<ol><li>This is intended for technical users only, who understand what all this stuff is and how it works.</li>
+			<li>Your data is stored on your device, using your browser's localStorage mechanism. If your browser shares this between devices and you don't like that, complain to whoever made your browser.</li>
+			<li>Your data is sent to and processed by whoever controls the URL specified in "API endpoint" (which you can specify yourself) when you press the "Enter" button. I don't know what they do with it, you should ask them, and if you don't like their answer use a different API provider instead.</li></ol>
+		</div>
 		<h2>Chat Session (stored locally)</h2>
 		<div class="group">
 			<h3>Settings</h3>
@@ -171,7 +195,7 @@
 		<table id="chatTable"></table>
 		
 		<input type="text" id="userMessage" placeholder="Type your message...">
-		<button onclick="sendMessage()">Enter</button>
+		<button id="enterButton" onclick="sendMessage()">Enter</button>
 	</div>
 	
 	<script>
@@ -207,6 +231,8 @@
 				return; // don't waste calls (though I may want to experiment with this later)
 			}
 			
+			document.getElementById("enterButton").classList.add('waiting-spinner');
+			
 			// Create a new message object for the user and append to existing messages
 			var newUserMessage = {
 				"role": "user",
@@ -220,15 +246,15 @@
 			makeAPIRequest(apiEndpoint, apiKeyInput, buildJSON(allMessages))
 				.then(response => {
 					var firstChoice = response.choices[0]; // This could change, but I don't see a good UI for it
-					console.log(firstChoice);
 					allMessages.push(firstChoice.message);
-					console.log(`before: ${document.currentChatObject.messages}`);
-					document.currentChatObject.messages = allMessages;
-					console.log(`after: ${document.currentChatObject.messages}`);
-					renderChatMessages(allMessages);
+					document.getElementById("userMessage").value = "";
 				})
 				.catch(error => {
 					alert(`Error: ${error}`);
+				})
+				.finally(() => {
+					document.currentChatObject.messages = allMessages;
+					renderChatMessages(allMessages);
 				});
 		}
 		
@@ -366,6 +392,8 @@
 				contentCell.className = "input-col";
 				contentCell.textContent = message.content;
 			});
+			
+			document.getElementById("enterButton").classList.remove('waiting-spinner');
 		}
 		
 		// Call the function to load chats when the page loads
