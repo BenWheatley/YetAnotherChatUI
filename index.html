@@ -28,6 +28,56 @@
 			margin-top: 0px;
 		}
 		
+		#chats {
+			border-collapse: separate;
+			border-spacing: 0 10px;
+			width: 20em;
+		}
+		
+		.chatlist-row {
+			padding: 10px;
+		}
+		
+		.chatlist-item-main-cell {
+			cursor: pointer;
+			max-width: 10em;
+			height: 30px;
+		}
+		
+		.chatlist-item-title {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		
+		.chatlist-item-date {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			font-size: 70%;
+			color: gray;
+		}
+		
+		.chatlist-delete-button {
+			width: 30px;
+			height: 30px;
+			display: inline-block;
+			background-color: #FF0000aa;
+			border: 1px solid red;
+			cursor: pointer;
+		}
+		
+		.chatlist-delete-button::before {
+			content: "♺";
+			font-size: 24px;
+			line-height: 14px;
+			color: white;
+			text-align: center; /* Center the icon horizontally */
+			display: block; /* Make the icon a block element */
+			position: relative;
+			top: 25%;
+		}
+		
 		.group {
 			position: relative;
 			border: 1px solid #ccc;
@@ -42,6 +92,28 @@
 		
 		.hidden {
 			display: none;
+		}
+		
+		#chat-title-group {
+			display: flex;
+			justify-content: space-between;
+		}
+		
+		#chat-title {
+			max-width: 50%;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			flex: 1; /* Take as much space as possible */
+			text-align: start; /* Align to the leading side respecting language direction */
+		}
+		
+		#chat-date {
+			flex-shrink: 0; /* Take as little space as possible */
+			text-align: end; /* Align to the trailing side respecting language direction */
+			color: grey;
+			font-size: 100%;
+			font-weight: normal;
 		}
 		
 		.form-table {
@@ -191,11 +263,14 @@
 				</tr>
 			</table>
 		</div>
+		<div class="group">
+			<h3 id="chat-title-group"><span id="chat-title"></span> <span id="chat-date"></span></h3>
+		</div>
 		
 		<table id="chatTable"></table>
 		
 		<input type="text" id="userMessage" placeholder="Type your message...">
-		<button id="enterButton" onclick="sendMessage()">Enter</button>
+		<button id="enterButton" onclick="sendMessage();">Enter</button>
 	</div>
 	
 	<script>
@@ -208,6 +283,14 @@
 			
 			// Update button content based on the state of the settings element
 			button.innerHTML = settings.classList.contains('hidden') ? '▼' : '▲';
+			
+			localStorage.setItem('settings-hidden', settings.classList.contains('hidden'));
+		}
+		
+		function preloadSettingsUIState() {
+			if (localStorage.getItem('settings-hidden') == 'true' /* true != 'true'; so 'thanks' JS */) {
+				document.getElementById('settings').classList.add('hidden');
+			}
 		}
 		
 		function saveApiKeyToStorage() {
@@ -223,7 +306,10 @@
 		function sendMessage() {
 			// Get API key or fast fail
 			var apiKeyInput = document.getElementById('apiKey').value;
-			if (apiKeyInput == null) { return; }
+			if (apiKeyInput == null || apiKeyInput == "") {
+				alert("You need an API key for this to work; contact your preferred model provider if you don't have one.");
+				return;
+			}
 			
 			// Get the user's message from the input field
 			var newUserMessageString = document.getElementById("userMessage").value;
@@ -238,7 +324,7 @@
 				"role": "user",
 				"content": newUserMessageString
 			};
-			if (document.currentChatObject == null) { makeInitialChatObject(); }
+			if (document.currentChatObject == null) { loadChat(new ChatObject()); }
 			var existingMessages = document.currentChatObject.messages;
 			var allMessages = existingMessages.concat(newUserMessage);
 			
@@ -253,8 +339,7 @@
 					alert(`Error: ${error}`);
 				})
 				.finally(() => {
-					document.currentChatObject.messages = allMessages;
-					renderChatMessages(allMessages);
+					document.currentChatObject.setMessages(allMessages);
 				});
 		}
 		
@@ -317,22 +402,133 @@
 			return parser(value);
 		}
 		
-		function makeInitialChatObject() {
-			document.currentChatObject = {
-				'apiEndpoint': "",
-				'model': '',
-				'temperature': '',
-				'maxTokens': '',
-				'topP': '',
-				'frequencyPenalty': '',
-				'presencePenalty': '',
-				'messages': []
-			};
+		class ChatObject {
+			constructor(title = "New chat", date = new Date(), apiEndpoint = "",
+						model = "", temperature = 0, maxTokens = 256,
+						topP = 1, frequencyPenalty = 0, presencePenalty = 0,
+						messages = []) {
+				this.title = title;
+				this.date = date;
+				this.apiEndpoint = apiEndpoint;
+				this.model = model;
+				this.temperature = temperature;
+				this.maxTokens = maxTokens;
+				this.topP = topP;
+				this.frequencyPenalty = frequencyPenalty;
+				this.presencePenalty = presencePenalty;
+				this.messages = messages;
+			}
+			
+			static createFromJson(json) {
+				const { title, date, apiEndpoint, model,
+						temperature, maxTokens, topP,
+						frequencyPenalty, presencePenalty, messages } = json;
+				return new ChatObject(
+						title, date, apiEndpoint,
+						model, temperature, maxTokens,
+						topP, frequencyPenalty, presencePenalty, messages);
+			}
+			
+			render() {
+				// web-app-level metadata
+				document.getElementById('chat-title').innerText = this.title || '';
+				document.getElementById('chat-date').innerText = this.date || '';
+				
+				// load API-level metadata
+				document.getElementById('apiEndpoint').value = this.apiEndpoint || '';
+				
+				document.getElementById('model').value = this.model || '';
+				document.getElementById('temperature').value = this.temperature || '';
+				document.getElementById('maxTokens').value = this.maxTokens || '';
+				document.getElementById('topP').value = this.topP || '';
+				document.getElementById('frequencyPenalty').value = this.frequencyPenalty || '';
+				document.getElementById('presencePenalty').value = this.presencePenalty || '';
+				
+				// load actual chat
+				this.renderChatMessages();
+			}
+			
+			renderChatMessages() {
+				var chatTable = document.getElementById("chatTable");
+				
+				// Clear existing rows in the table
+				chatTable.innerHTML = "";
+				
+				// Iterate through each message object and append a row to the table
+				this.messages.forEach(message => {
+					var row = chatTable.insertRow();
+					var roleCell = row.insertCell(0);
+					roleCell.classList.add(message.role);
+					roleCell.classList.add("label-col");
+					var contentCell = row.insertCell(1);
+					contentCell.className = "input-col";
+					contentCell.textContent = message.content;
+				});
+				
+				document.getElementById("enterButton").classList.remove('waiting-spinner');
+			}
+			
+			setMessages(allMessages) {
+				this.messages = allMessages;
+				this.renderChatMessages();
+			}
 		}
 		
-		function loadAllChatsFromStorage() {
+		function loadAndConvertAllChats() {
 			// Get the chats data from localStorage
 			var chatsData = JSON.parse(localStorage.getItem("chats")) || [];
+			return chatsData.map(chatJSON => ChatObject.createFromJson(chatJSON));
+		}
+		
+		function saveTheseChats(chatsData) {
+			// Save the updated chatsData to localStorage
+			localStorage.setItem("chats", JSON.stringify(chatsData));
+		}
+		
+		function saveChatToStorage(chatObject) {
+			var chatsData = loadAndConvertAllChats();
+			// Search for an object with the same date as chatObject
+			var existingChatIndex = chatsData.findIndex(chat => chat.date === chatObject.date);
+			var firstUserMessage = (chatObject.messages.find(message => message.role === "user") || {}).content;
+			chatObject.title = firstUserMessage;
+			if (existingChatIndex !== -1) { // If found, replace with chatObject
+				chatsData[existingChatIndex] = chatObject;
+			} else { // If not found, add chatObject as a new item in the array
+				chatsData.push(chatObject);
+			}
+			saveTheseChats(chatsData);
+		}
+		
+		function loadChat(chatObject) {
+			document.currentChatObject = chatObject;
+			saveChatToStorage(document.currentChatObject);
+			chatObject.render();
+			renderChatsList();
+		}
+		
+		function deleteChat(chatObject) {
+			var chatsData = loadAndConvertAllChats();
+			
+			// Find the index of the chatObject to be deleted based on its date
+			var indexToDelete = chatsData.findIndex(chat => chat.date === chatObject.date);
+			
+			if (indexToDelete !== -1) {
+				// Remove the chatObject from chatsData array
+				chatsData.splice(indexToDelete, 1);
+				// Save the updated chatsData array
+				saveTheseChats(chatsData);
+			} else {
+				console.warn("Chat not found for deletion.");
+			}
+			
+			if (document.currentChatObject == undefined ||
+				(document.currentChatObject.date == chatObject.date)) {
+				loadChat(new ChatObject());
+			}
+		}
+		
+		function renderChatsList() {
+			var chatsData = loadAndConvertAllChats();
 			
 			// Sort chats by date in descending order
 			chatsData.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -346,59 +542,49 @@
 			// Iterate through each chat object and append a row to the table
 			chatsData.forEach(chat => {
 				var row = chatsTable.insertRow();
+				row.classList.add("chatlist-row");
+				
 				var cell = row.insertCell(0);
-				cell.textContent = chat.title;
-				row.addEventListener("click", function() {
+				cell.classList.add("chatlist-item-main-cell");
+								
+				// Create title div
+				var titleDiv = document.createElement('div');
+				titleDiv.classList.add('chatlist-item-title');
+				titleDiv.textContent = chat.title;
+				
+				// Create date div
+				var dateDiv = document.createElement('div');
+				dateDiv.classList.add('chatlist-item-date');
+				dateDiv.textContent = chat.date;
+				
+				// Append title and date divs to the cell
+				cell.appendChild(titleDiv);
+				cell.appendChild(dateDiv);
+				
+				cell.addEventListener("click", function() {
 					loadChat(chat);
+				});
+				
+				var deleteButton = row.insertCell(1);
+				deleteButton.classList.add("chatlist-delete-button");
+				deleteButton.addEventListener("click", function() {
+					deleteChat(chat);
 				});
 			});
 		}
 		
-		function saveChatToStorage(chatObject) {
-			
-		}
-		
-		function loadChat(chatObject) {
-			saveChatToStorage(document.currentChatObject);
-			
-			document.currentChatObject = chatObject;
-			
-			// load metadata
-			document.getElementById('apiEndpoint').value = chatObject.apiEndpoint || '';
-			
-			document.getElementById('model').value = chatObject.model || '';
-			document.getElementById('temperature').value = chatObject.temperature || '';
-			document.getElementById('maxTokens').value = chatObject.maxTokens || '';
-			document.getElementById('topP').value = chatObject.topP || '';
-			document.getElementById('frequencyPenalty').value = chatObject.frequencyPenalty || '';
-			document.getElementById('presencePenalty').value = chatObject.presencePenalty || '';
-			
-			renderChatMessages(chatObject.messages);
-		}
-		
-		function renderChatMessages(messages) {
-			var chatTable = document.getElementById("chatTable");
-			
-			// Clear existing rows in the table
-			chatTable.innerHTML = "";
-			
-			// Iterate through each message object and append a row to the table
-			messages.forEach(message => {
-				var row = chatTable.insertRow();
-				var roleCell = row.insertCell(0);
-				roleCell.classList.add(message.role);
-				roleCell.classList.add("label-col");
-				var contentCell = row.insertCell(1);
-				contentCell.className = "input-col";
-				contentCell.textContent = message.content;
-			});
-			
-			document.getElementById("enterButton").classList.remove('waiting-spinner');
-		}
-		
 		// Call the function to load chats when the page loads
 		window.onload = function () {
-			loadAllChatsFromStorage();
+			preloadSettingsUIState();
+			renderChatsList();
+			
+			var chatsData = loadAndConvertAllChats();
+			if (chatsData.length > 0) {
+				// If there is at least one chat, load the first
+				loadChat(chatsData[0]);
+			} else {
+				loadChat(new ChatObject());
+			}
 			
 			// API key:
 			initializeApiKeyFromStorage();
