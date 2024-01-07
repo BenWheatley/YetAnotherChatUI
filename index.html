@@ -163,6 +163,36 @@
 			content: "\1F916"; /* Robot Emoji */
 		}
 		
+		.preformatted-block {
+			background: black;
+			color: white;
+			margin: 5px;
+		}
+		
+		.preformatted-block-header {
+			background: #333;
+			padding: 5px;
+			display: flex;
+			justify-content: space-between;
+		}
+		
+		.preformatted-block-language {}
+		
+		.preformatted-block-copy-button {
+			color: #ddd;
+			text-align: right;
+			padding: 0px 5px;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+		
+		.preformatted-block-content {
+			white-space: pre;
+			font-family: monospace;
+			padding: 5px;
+		}
+		
 		input[type="text"] {
 			padding: 8px;
 			width: 80%;
@@ -462,7 +492,7 @@
 					roleCell.classList.add("label-col");
 					var contentCell = row.insertCell(1);
 					contentCell.className = "input-col";
-					contentCell.textContent = message.content;
+					contentCell.innerHTML = this.renderTextForTable(message.content);
 				});
 				
 				document.getElementById("enterButton").classList.remove('waiting-spinner');
@@ -471,6 +501,29 @@
 			setMessages(allMessages) {
 				this.messages = allMessages;
 				this.renderChatMessages();
+				saveChatToStorage(this);
+			}
+			
+			renderTextForTable(text) {
+				// Check for code blocks and render them appropriately
+				const codeBlockRegex = /```\s*([\S]+)\s([\s\S]*?)\n```/gms;
+				const header = `<div class="preformatted-block-header"><span class='preformatted-block-language'>$1</span><span class="preformatted-block-copy-button" onclick="copyToClipboard(this);">Copy code</span></div>`;
+				const body = `<div class="preformatted-block-content">$2</div>`;
+				const codeBlockSubst = `<div class="preformatted-block">${header}${body}</div>`;
+				text = text.replace(codeBlockRegex, codeBlockSubst);
+				
+				// Render inline code
+				const inlineCodeRegex = /`([^`]+)`/g;
+				const inlineCodeSubst = `<code>$1</code>`;
+				text = text.replace(inlineCodeRegex, inlineCodeSubst);
+				
+				return text;
+			}
+			
+			encodeHtmlEntities(html) {
+				return html.replace(/[\u00A0-\u9999<>\&]/gim, function (i) {
+					return '&#' + i.charCodeAt(0) + ';';
+				});
 			}
 		}
 		
@@ -478,11 +531,6 @@
 			// Get the chats data from localStorage
 			var chatsData = JSON.parse(localStorage.getItem("chats")) || [];
 			return chatsData.map(chatJSON => ChatObject.createFromJson(chatJSON));
-		}
-		
-		function saveTheseChats(chatsData) {
-			// Save the updated chatsData to localStorage
-			localStorage.setItem("chats", JSON.stringify(chatsData));
 		}
 		
 		function saveChatToStorage(chatObject) {
@@ -497,6 +545,11 @@
 				chatsData.push(chatObject);
 			}
 			saveTheseChats(chatsData);
+		}
+		
+		function saveTheseChats(chatsData) {
+			// Save the updated chatsData to localStorage
+			localStorage.setItem("chats", JSON.stringify(chatsData));
 		}
 		
 		function loadChat(chatObject) {
@@ -571,6 +624,29 @@
 					deleteChat(chat);
 				});
 			});
+		}
+		
+		function copyToClipboard(buttonElement) {
+			// Traverse to the corresponding content div
+			var contentDiv = buttonElement.parentElement.nextElementSibling;
+			
+			// Create a range and select the content
+			var range = document.createRange();
+			range.selectNodeContents(contentDiv);
+			
+			// Create a selection and add the range to it
+			var selection = window.getSelection();
+			selection.removeAllRanges();
+			selection.addRange(range);
+			
+			// Execute the copy command
+			document.execCommand('copy');
+			
+			// Clear the selection
+			selection.removeAllRanges();
+			
+			// Optionally, provide feedback to the user
+			alert('Text copied to clipboard!');
 		}
 		
 		// Call the function to load chats when the page loads
