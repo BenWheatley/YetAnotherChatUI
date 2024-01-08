@@ -86,6 +86,9 @@
 			border: 1px solid #ccc;
 			padding: 10px;
 			overflow: hidden;
+			margin-top: 20px;
+			margin-bottom: 20px;
+			border-radius: 5px;
 		}
 		
 		.group h3 {
@@ -142,8 +145,12 @@
 			white-space: nowrap;
 		}
 		
-		.input-col {
-			text-align: left;
+		.role-col {
+			text-align: right;
+			width: 1px; /* Weirdly, this doesn't actually limit it to 1px */
+			white-space: nowrap;
+			border: none;
+			vertical-align: top;x
 		}
 		
 		table {
@@ -152,15 +159,10 @@
 			margin-bottom: 20px;
 		}
 		
-		th, td {
+		td {
 			padding: 10px;
 			border: 1px solid #ddd;
 			text-align: left;
-		}
-		
-		th {
-			background-color: #4CAF50;
-			color: white;
 		}
 		
 		.system::before {
@@ -173,6 +175,23 @@
 		
 		.assistant::before {
 			content: "\1F916"; /* Robot Emoji */
+		}
+		
+		.conversation-col:before {
+			content: "";
+			position: absolute;
+			top: 50%;
+			right: 100%;
+			margin-top: -5px; /* Adjust the margin to center the triangle vertically */
+			border-width: 5px;
+			border-style: solid;
+			border-color: transparent transparent transparent #ffffff; /* Match the background color */
+		}
+		
+		.conversation-col {
+			background-color: #f0f8ff;
+			border-radius: 10px;
+			border: none;
 		}
 		
 		.preformatted-block {
@@ -517,9 +536,9 @@
 					var row = chatTable.insertRow();
 					var roleCell = row.insertCell(0);
 					roleCell.classList.add(message.role);
-					roleCell.classList.add("label-col");
+					roleCell.classList.add("role-col");
 					var contentCell = row.insertCell(1);
-					contentCell.className = "input-col";
+					contentCell.className = "conversation-col";
 					contentCell.innerHTML = this.renderTextForTable(message.content);
 				});
 				
