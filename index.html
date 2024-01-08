@@ -377,6 +377,14 @@
 			}
 		}
 		
+		function saveSelectedDate(date) {
+			localStorage.setItem('selected-date', date);
+		}
+		
+		function loadSelectedDate() {
+			return localStorage.getItem('selected-date');
+		}
+		
 		function saveApiKeyToStorage() {
 			var apiKeyValue = document.getElementById('apiKey').value;
 			localStorage.setItem('apiKey', apiKeyValue);
@@ -634,10 +642,19 @@
 		
 		function saveChatToStorage(chatObject) {
 			var chatsData = loadAndConvertAllChats();
+			
 			// Search for an object with the same date as chatObject
 			var existingChatIndex = chatsData.findIndex(chat => chat.date === chatObject.date);
-			var firstUserMessage = (chatObject.messages.find(message => message.role === "user") || {}).content;
-			chatObject.title = firstUserMessage;
+			// Mutate date after finding old object and before saving new one
+			chatObject.date = new Date();
+			saveSelectedDate(chatObject.date);
+			
+			// If there isn't already a title, add a default one
+			if (chatObject.title == undefined || chatObject.title == null || chatObject.title == "") {
+				var firstUserMessage = (chatObject.messages.find(message => message.role === "user") || {}).content;
+				chatObject.title = firstUserMessage;
+			}
+			
 			if (existingChatIndex !== -1) { // If found, replace with chatObject
 				chatsData[existingChatIndex] = chatObject;
 			} else { // If not found, add chatObject as a new item in the array
@@ -653,6 +670,7 @@
 		
 		function loadChat(chatObject) {
 			document.currentChatObject = chatObject;
+			saveSelectedDate(chatObject.date);
 			saveChatToStorage(document.currentChatObject);
 			chatObject.render();
 			renderChatsList();
@@ -758,17 +776,28 @@
 			field.rows = 1;
 		}
 		
-		// Call the function to load chats when the page loads
-		window.onload = function () {
-			preloadSettingsUIState();
-			renderChatsList();
-			
-			var chatsData = loadAndConvertAllChats();
+		function loadDefaultChat(chatsData) {
 			if (chatsData.length > 0) {
 				// If there is at least one chat, load the first
 				loadChat(chatsData[0]);
 			} else {
 				startNewChat();
+			}
+		}
+		
+		// Call the function to load chats when the page loads
+		window.onload = function () {
+			preloadSettingsUIState();
+			renderChatsList();
+			
+			var selectedDate = loadSelectedDate();
+			var chatsData = loadAndConvertAllChats();
+			if (selectedDate == undefined) {
+				loadDefaultChat(chatsData);
+			} else {
+				var selectedChat = chatsData.find(chat => chat.date === selectedDate);
+				if (selectedChat) { loadChat(selectedChat); }
+				else { loadDefaultChat(chatsData); }
 			}
 			
 			// API key:
