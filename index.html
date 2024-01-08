@@ -121,10 +121,19 @@
 		
 		.form-table {
 			width: 100%;
+			margin-bottom: 0px;
 		}
 		
 		.form-table td {
 			padding: 5px;
+		}
+		
+		td p:first-child {
+			margin-top: 0;
+		}
+		
+		td p:last-child {
+			margin-bottom: 0;
 		}
 		
 		.label-col {
@@ -197,14 +206,25 @@
 		}
 		
 		input[type="text"] {
-			padding: 8px;
-			width: 80%;
-			margin-right: 10px;
+			width: 90%;
+		}
+		
+		#user-input-row {
+			display: flex;
+			width: 100%;
+		}
+		
+		#userMessage {
+			flex: 1;
+			margin-right: 1em;
+			box-sizing: border-box;
+			font-size: 16px;
+			resize: none;
 		}
 		
 		.hideButton {
 			position: absolute;
-			top: 0;
+			top: -4px;
 			right: 0;
 			margin: 10px;
 		}
@@ -215,6 +235,8 @@
 			color: white;
 			border: none;
 			cursor: pointer;
+			font-size: 16px;
+			height: 34px;
 		}
 		
 		.waiting-spinner {
@@ -303,8 +325,10 @@
 		
 		<table id="chatTable"></table>
 		
-		<input type="text" id="userMessage" placeholder="Type your message...">
-		<button id="enterButton" onclick="sendMessage();">Enter</button>
+		<div id="user-input-row">
+			<textarea id="userMessage" placeholder="Type your message..." rows="1"></textarea>
+			<button id="enterButton" onclick="sendMessage();">Enter</button>
+		</div>
 	</div>
 	
 	<script>
@@ -367,7 +391,7 @@
 				.then(response => {
 					var firstChoice = response.choices[0]; // This could change, but I don't see a good UI for it
 					allMessages.push(firstChoice.message);
-					document.getElementById("userMessage").value = "";
+					resetUserInputField();
 				})
 				.catch(error => {
 					alert(`Error: ${error}`);
@@ -510,32 +534,59 @@
 			
 			renderTextForTable(text) {
 				// Caution: this is not a real parser, it's just a bunch of regexes with all that this entails
+				// e.g. no arbitrary nested lists are possible
 				
-				// Check for code blocks and render them appropriately
-				const codeBlockRegex = /```\s*([\S]+)\s([\s\S]*?)\n```/gms;
-				const header = `<div class="preformatted-block-header"><span class='preformatted-block-language'>$1</span><span class="preformatted-block-copy-button" onclick="copyToClipboard(this);">Copy code</span></div>`;
-				const body = `<div class="preformatted-block-content">$2</div>`;
-				const codeBlockSubst = `<div class="preformatted-block">${header}${body}</div>`;
-				text = text.replace(codeBlockRegex, codeBlockSubst);
+				// Check for code blocks and temporarily replace them with placeholders
+				const codeBlockRegex = /```[\s\S]*?```/gms;
+				const codeBlocks = [];
+				text = text.replace(codeBlockRegex, (match, index) => {
+					codeBlocks.push(match);
+					return `CODEBLOCK-PLACEHOLDER-${codeBlocks.length - 1}`;
+				});
 				
 				// Render inline code
 				const inlineCodeRegex = /`([^`]+)`/g;
 				const inlineCodeSubst = `<code>$1</code>`;
 				text = text.replace(inlineCodeRegex, inlineCodeSubst);
 				
-				if (true /* TODO: I need a way to do this but only outside a code block */) {
-					text = text.replace(/([^\n]+)/gm, "<p>$1</p>");
+				// Apply transformations outside code blocks
+				text = text.replace(/$(#[^\n]+)^/gms, "<p>$1</p>");
 				
-					// Bold
-					text = text.replace(/\*\*([^\n]*?)\*\*/gm, "<strong>$1</strong>");
-					text = text.replace(/__([^\n]*?)__/gm, "<strong>$1</strong>");
+				// Headings
+				text = text.replace(/^\s*# (.+)$/gm, "<h1>$1</h1>");
+				text = text.replace(/^\s*## (.+)$/gm, "<h2>$1</h2>");
+				text = text.replace(/^\s*### (.+)$/gm, "<h3>$1</h3>");
+				text = text.replace(/^\s*#### (.+)$/gm, "<h4>$1</h4>");
+				text = text.replace(/^\s*##### (.+)$/gm, "<h5>$1</h5>");
+				text = text.replace(/^\s*###### (.+)$/gm, "<h6>$1</h6>");
 				
-					// Italic
-					text = text.replace(/\*([^\*]*?)\*/gm, "<em>$1</em>");
-					text = text.replace(/_([^_]*?)_/gm, "<em>$1</em>");
-				}
+				// Bold
+				text = text.replace(/\*\*(.*?)\*\*/gms, "<strong>$1</strong>");
+				text = text.replace(/__(.*?)__/gms, "<strong>$1</strong>");
+				
+				// Italic
+				text = text.replace(/\*([^\*]*?)\*/gms, "<em>$1</em>");
+				text = text.replace(/_([^_]*?)_/gms, "<em>$1</em>");
+				
+				// Restore the original code blocks
+				codeBlocks.forEach((codeBlock, index) => {
+					codeBlock = this.formatCodeBlock(codeBlock);
+					text = text.replace(`CODEBLOCK-PLACEHOLDER-${index}`, codeBlock);
+				});
 				
 				return text;
+			}
+			
+			formatCodeBlock(codeBlock) {
+				codeBlock = codeBlock.replaceAll("```", "");
+				codeBlock = this.encodeHtmlEntities(codeBlock);
+				const codeBlockRegex = /\s*([^\s#]*)\s([\s\S]*)\n/gms;
+				const header = `<div class="preformatted-block-header"><span class='preformatted-block-language'>$1</span><span class="preformatted-block-copy-button" onclick="copyToClipboard(this);">Copy code</span></div>`;
+				const body = `<div class="preformatted-block-content">$2</div>`;
+				const codeBlockSubst = `<div class="preformatted-block">${header}${body}</div>`;
+				codeBlock = codeBlock.replace(codeBlockRegex, codeBlockSubst);
+				
+				return codeBlock;
 			}
 			
 			encodeHtmlEntities(html) {
@@ -671,6 +722,12 @@
 			loadChat(new ChatObject());
 		}
 		
+		function resetUserInputField() {
+			const field = document.getElementById("userMessage");
+			field.value = "";
+			field.rows = 1;
+		}
+		
 		// Call the function to load chats when the page loads
 		window.onload = function () {
 			preloadSettingsUIState();
@@ -689,6 +746,11 @@
 			// Add an event listener to the input to save the API key when modified
 			var apiKeyInput = document.getElementById('apiKey');
 			apiKeyInput.addEventListener('input', saveApiKeyToStorage);
+			
+			// Auto-resize text entry field as rows are added
+			document.getElementById('userMessage').addEventListener('input', function () {
+				this.rows = this.value.split('\n').length || 1;
+			});
 		};
 
 	</script>
