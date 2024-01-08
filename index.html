@@ -237,6 +237,7 @@
 	
 	<div id="chats-container">
 		<h2>Chats (stored locally)</h2>
+		<button id="startNewChat" onClick="startNewChat();">Start new chat</button>
 		<!-- List of chats (left column) will be populated dynamically -->
 		<table id="chats">
 		</table>
@@ -505,6 +506,8 @@
 			}
 			
 			renderTextForTable(text) {
+				// Caution: this is not a real parser, it's just a bunch of regexes with all that this entails
+				
 				// Check for code blocks and render them appropriately
 				const codeBlockRegex = /```\s*([\S]+)\s([\s\S]*?)\n```/gms;
 				const header = `<div class="preformatted-block-header"><span class='preformatted-block-language'>$1</span><span class="preformatted-block-copy-button" onclick="copyToClipboard(this);">Copy code</span></div>`;
@@ -516,6 +519,18 @@
 				const inlineCodeRegex = /`([^`]+)`/g;
 				const inlineCodeSubst = `<code>$1</code>`;
 				text = text.replace(inlineCodeRegex, inlineCodeSubst);
+				
+				if (true /* TODO: I need a way to do this but only outside a code block */) {
+					text = text.replace(/([^\n]+)/gm, "<p>$1</p>");
+				
+					// Bold
+					text = text.replace(/\*\*([^\n]*?)\*\*/gm, "<strong>$1</strong>");
+					text = text.replace(/__([^\n]*?)__/gm, "<strong>$1</strong>");
+				
+					// Italic
+					text = text.replace(/\*([^\*]*?)\*/gm, "<em>$1</em>");
+					text = text.replace(/_([^_]*?)_/gm, "<em>$1</em>");
+				}
 				
 				return text;
 			}
@@ -649,6 +664,10 @@
 			alert('Text copied to clipboard!');
 		}
 		
+		function startNewChat() {
+			loadChat(new ChatObject());
+		}
+		
 		// Call the function to load chats when the page loads
 		window.onload = function () {
 			preloadSettingsUIState();
@@ -659,7 +678,7 @@
 				// If there is at least one chat, load the first
 				loadChat(chatsData[0]);
 			} else {
-				loadChat(new ChatObject());
+				startNewChat();
 			}
 			
 			// API key:
