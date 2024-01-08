@@ -422,13 +422,23 @@
 			
 			var apiEndpoint = extractFrom("apiEndpoint", String);
 			makeAPIRequest(apiEndpoint, apiKeyInput, buildJSON(allMessages))
-				.then(response => {
-					var firstChoice = response.choices[0]; // This could change, but I don't see a good UI for it
+				.then(({response, result}) => {
+					if (!response.ok) {
+						alert(`Server didn't like it (${response.status}): ${result.error.message}`);
+						return;
+					}
+					var firstChoice = result.choices[0]; // This could change, but I don't see a good UI for it
 					allMessages.push(firstChoice.message);
 					resetUserInputField();
 				})
 				.catch(error => {
-					alert(`Error: ${error}`);
+					console.log(error_message);
+					var error_message = `Error:\n${error}`;
+					var details = error["message"];
+					if (details != undefined) {
+						error_message = details;
+					}
+					alert(error_message);
 				})
 				.finally(() => {
 					document.currentChatObject.setMessages(allMessages);
@@ -478,9 +488,12 @@
 			
 			try {
 				const response = await fetch(url, requestOptions);
+				if (!response.ok) {
+					console.log(`Response from API was not OK, http code: ${response.status} (${response.statusText})`);
+				}
 				const result = await response.json();
 				console.log('Response from API:', result);
-				return result;
+				return {response, result};
 				
 			} catch (error) {
 				console.error('Error making API request:', error);
