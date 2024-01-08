@@ -177,21 +177,28 @@
 			content: "\1F916"; /* Robot Emoji */
 		}
 		
-		.conversation-col:before {
-			content: "";
-			position: absolute;
-			top: 50%;
-			right: 100%;
-			margin-top: -5px; /* Adjust the margin to center the triangle vertically */
-			border-width: 5px;
-			border-style: solid;
-			border-color: transparent transparent transparent #ffffff; /* Match the background color */
+		.conversation-col {
+			padding: 0px;
+			padding-left: 10px;
+			border: none;
 		}
 		
-		.conversation-col {
-			background-color: #f0f8ff;
-			border-radius: 10px;
-			border: none;
+		.conversation-col-content::after {
+			content: "";
+			position: absolute;
+			width: 0;
+			border: solid 1px #def;
+			border-width: 1px 20px 1px 0px;
+			top: 20px;
+			left: -20px;
+		}
+		
+		.conversation-col-content {
+			position: relative;
+			background: #f0f8ff;
+			border: solid 1px #def;
+			border-radius: 5px;
+			padding: 0.5em;
 		}
 		
 		.preformatted-block {
@@ -539,7 +546,10 @@
 					roleCell.classList.add("role-col");
 					var contentCell = row.insertCell(1);
 					contentCell.className = "conversation-col";
-					contentCell.innerHTML = this.renderTextForTable(message.content);
+					let div = document.createElement("div");
+					div.className = "conversation-col-content";
+					div.innerHTML = this.renderTextForTable(message.content);
+					contentCell.appendChild(div);
 				});
 				
 				document.getElementById("enterButton").classList.remove('waiting-spinner');
@@ -563,13 +573,11 @@
 					return `CODEBLOCK-PLACEHOLDER-${codeBlocks.length - 1}`;
 				});
 				
+				// Apply transformations outside code blocks
 				// Render inline code
 				const inlineCodeRegex = /`([^`]+)`/g;
 				const inlineCodeSubst = `<code>$1</code>`;
 				text = text.replace(inlineCodeRegex, inlineCodeSubst);
-				
-				// Apply transformations outside code blocks
-				text = text.replace(/$(#[^\n]+)^/gms, "<p>$1</p>");
 				
 				// Headings
 				text = text.replace(/^\s*# (.+)$/gm, "<h1>$1</h1>");
@@ -578,6 +586,9 @@
 				text = text.replace(/^\s*#### (.+)$/gm, "<h4>$1</h4>");
 				text = text.replace(/^\s*##### (.+)$/gm, "<h5>$1</h5>");
 				text = text.replace(/^\s*###### (.+)$/gm, "<h6>$1</h6>");
+				
+				// paragraphs
+				text = text.replace(/([^#][^\n]+)/gms, "<p>$1</p>");
 				
 				// Bold
 				text = text.replace(/\*\*(.*?)\*\*/gms, "<strong>$1</strong>");
