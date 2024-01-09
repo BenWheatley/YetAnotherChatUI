@@ -100,26 +100,27 @@
 			display: none;
 		}
 		
-		#chat-title-group {
-			display: flex;
-			justify-content: space-between;
-		}
-		
-		#chat-title {
-			max-width: 50%;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			flex: 1; /* Take as much space as possible */
-			text-align: start; /* Align to the leading side respecting language direction */
+		#chat-title-container {
+			padding-bottom: 1em;
 		}
 		
 		#chat-date {
-			flex-shrink: 0; /* Take as little space as possible */
 			text-align: end; /* Align to the trailing side respecting language direction */
 			color: grey;
-			font-size: 100%;
-			font-weight: normal;
+			font-size: 75%;
+		}
+		
+		#chat-title {
+			white-space: nowrap;
+			width: 100%;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			text-align: start; /* Align to the leading side respecting language direction */
+			border: none;
+			border-bottom: 1px solid #ccc;
+			font-size: 1.5em;
+			font-weight: 600;
+			background: clear;
 		}
 		
 		.form-table {
@@ -345,8 +346,9 @@
 				</tr>
 			</table>
 		</div>
-		<div class="group">
-			<h3 id="chat-title-group"><span id="chat-title"></span> <span id="chat-date"></span></h3>
+		<div id="chat-title-container">
+			<span id="chat-date"></span>
+			<input type="text" id="chat-title" placeholder="Chat title">
 		</div>
 		
 		<table id="chatTable"></table>
@@ -377,12 +379,12 @@
 			}
 		}
 		
-		function saveSelectedDate(date) {
-			localStorage.setItem('selected-date', date);
+		function saveSelectedUUID(uuid) {
+			localStorage.setItem('selected-uuid', uuid);
 		}
 		
-		function loadSelectedDate() {
-			return localStorage.getItem('selected-date');
+		function loadSelectedUUID() {
+			return localStorage.getItem('selected-uuid');
 		}
 		
 		function saveApiKeyToStorage() {
@@ -511,9 +513,14 @@
 			constructor(title = "New chat", date = new Date(), apiEndpoint = "",
 						model = "", temperature = 0, maxTokens = 256,
 						topP = 1, frequencyPenalty = 0, presencePenalty = 0,
-						messages = []) {
+						messages = [], uuid = crypto.randomUUID()) {
+				// Metadata
+				// Not user facing
+				this.uuid = uuid || crypto.randomUUID();
+				// User facing
 				this.title = title;
 				this.date = date;
+				// API data
 				this.apiEndpoint = apiEndpoint;
 				this.model = model;
 				this.temperature = temperature;
@@ -525,18 +532,27 @@
 			}
 			
 			static createFromJson(json) {
-				const { title, date, apiEndpoint, model,
+				const { uuid, title, date, apiEndpoint, model,
 						temperature, maxTokens, topP,
 						frequencyPenalty, presencePenalty, messages } = json;
 				return new ChatObject(
 						title, date, apiEndpoint,
 						model, temperature, maxTokens,
-						topP, frequencyPenalty, presencePenalty, messages);
+						topP, frequencyPenalty, presencePenalty,
+						messages, uuid);
+			}
+			
+			titleOrPlaceholder() {
+				if (this.title == undefined || this.title == null || this.title == "") {
+					var firstUserMessage = (this.messages.find(message => message.role === "user") || {}).content;
+					return firstUserMessage;
+				}
+				return this.title;
 			}
 			
 			render() {
 				// web-app-level metadata
-				document.getElementById('chat-title').innerText = this.title || '';
+				document.getElementById('chat-title').value = this.titleOrPlaceholder();
 				document.getElementById('chat-date').innerText = this.date || '';
 				
 				// load API-level metadata
@@ -654,19 +670,15 @@
 		}
 		
 		function saveChatToStorage(chatObject) {
+			saveSelectedUUID(chatObject.uuid);
+			
 			var chatsData = loadAndConvertAllChats();
 			
-			// Search for an object with the same date as chatObject
-			var existingChatIndex = chatsData.findIndex(chat => chat.date === chatObject.date);
-			// Mutate date after finding old object and before saving new one
-			chatObject.date = new Date();
-			saveSelectedDate(chatObject.date);
+			// Search for an object with the same uuid as chatObject
+			var existingChatIndex = chatsData.findIndex(chat => chat.uuid === chatObject.uuid);
 			
-			// If there isn't already a title, add a default one
-			if (chatObject.title == undefined || chatObject.title == null || chatObject.title == "") {
-				var firstUserMessage = (chatObject.messages.find(message => message.role === "user") || {}).content;
-				chatObject.title = firstUserMessage;
-			}
+			// Mutate date before saving new one
+			chatObject.date = new Date();
 			
 			if (existingChatIndex !== -1) { // If found, replace with chatObject
 				chatsData[existingChatIndex] = chatObject;
@@ -683,7 +695,7 @@
 		
 		function loadChat(chatObject) {
 			document.currentChatObject = chatObject;
-			saveSelectedDate(chatObject.date);
+			saveSelectedUUID(chatObject.uuid);
 			saveChatToStorage(document.currentChatObject);
 			chatObject.render();
 			renderChatsList();
@@ -692,8 +704,8 @@
 		function deleteChat(chatObject) {
 			var chatsData = loadAndConvertAllChats();
 			
-			// Find the index of the chatObject to be deleted based on its date
-			var indexToDelete = chatsData.findIndex(chat => chat.date === chatObject.date);
+			// Find the index of the chatObject to be deleted based on its uuid
+			var indexToDelete = chatsData.findIndex(chat => chat.uuid === chatObject.uuid);
 			
 			if (indexToDelete !== -1) {
 				// Remove the chatObject from chatsData array
@@ -705,8 +717,10 @@
 			}
 			
 			if (document.currentChatObject == undefined ||
-				(document.currentChatObject.date == chatObject.date)) {
+				(document.currentChatObject.uuid == chatObject.uuid)) {
 				startNewChat();
+			} else {
+				renderChatsList();
 			}
 		}
 		
@@ -733,7 +747,7 @@
 				// Create title div
 				var titleDiv = document.createElement('div');
 				titleDiv.classList.add('chatlist-item-title');
-				titleDiv.textContent = chat.title;
+				titleDiv.textContent = chat.titleOrPlaceholder();
 				
 				// Create date div
 				var dateDiv = document.createElement('div');
@@ -803,12 +817,12 @@
 			preloadSettingsUIState();
 			renderChatsList();
 			
-			var selectedDate = loadSelectedDate();
+			var selectedUUID = loadSelectedUUID();
 			var chatsData = loadAndConvertAllChats();
-			if (selectedDate == undefined) {
+			if (selectedUUID == undefined) {
 				loadDefaultChat(chatsData);
 			} else {
-				var selectedChat = chatsData.find(chat => chat.date === selectedDate);
+				var selectedChat = chatsData.find(chat => chat.uuid === selectedUUID);
 				if (selectedChat) { loadChat(selectedChat); }
 				else { loadDefaultChat(chatsData); }
 			}
