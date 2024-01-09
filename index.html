@@ -369,7 +369,7 @@
 	
 	<script>
 		function toggleSettings() {
-			var settings = _ks.id('settings');
+			var settings = _doc.id('settings');
 			settings.classList.toggle('hidden');
 			
 			// Get the button element
@@ -383,7 +383,7 @@
 		
 		function preloadSettingsUIState() {
 			if (localStorage.getItem('settings-hidden') == 'true' /* true != 'true'; so 'thanks' JS */) {
-				_ks.id('settings').classList.add('hidden');
+				_doc.id('settings').classList.add('hidden');
 			}
 		}
 		
@@ -396,30 +396,30 @@
 		}
 		
 		function saveApiKeyToStorage() {
-			var apiKeyValue = _ks.id('apiKey').value;
+			var apiKeyValue = _doc.id('apiKey').value;
 			localStorage.setItem('apiKey', apiKeyValue);
 		}
 		
 		function initializeApiKeyFromStorage() {
-			var apiKeyInput = _ks.id('apiKey');
+			var apiKeyInput = _doc.id('apiKey');
 			apiKeyInput.value = localStorage.getItem('apiKey') || '';
 		}
 		
 		function sendMessage() {
 			// Get API key or fast fail
-			var apiKeyInput = _ks.id('apiKey').value;
+			var apiKeyInput = _doc.id('apiKey').value;
 			if (apiKeyInput == null || apiKeyInput == "") {
 				alert("You need an API key for this to work; contact your preferred model provider if you don't have one.");
 				return;
 			}
 			
 			// Get the user's message from the input field
-			var newUserMessageString = _ks.id("userMessage").value;
+			var newUserMessageString = _doc.id("userMessage").value;
 			if (newUserMessageString == null) {
 				return; // don't waste calls (though I may want to experiment with this later)
 			}
 			
-			_ks.id("enterButton").classList.add('waiting-spinner');
+			_doc.id("enterButton").classList.add('waiting-spinner');
 			
 			// Create a new message object for the user and append to existing messages
 			var newUserMessage = {
@@ -512,21 +512,21 @@
 		}
 		
 		function extractFrom(elementId, parser) {
-			var element = _ks.id(elementId);
+			var element = _doc.id(elementId);
 			var value = element.value || element.placeholder;
 			return parser(value);
 		}
 		
 		class ChatObject {
 		/* copy from here if possible?
-				this.apiEndpoint = _ks.id('apiEndpoint').value || '';
+				this.apiEndpoint = _doc.id('apiEndpoint').value || '';
 				
-				this.model = _ks.id('model').value || '';
-				this.temperature = _ks.id('temperature').value || '';
-				this.maxTokens = _ks.id('maxTokens').value || '';
-				this.topP = _ks.id('topP').value || '';
-				this.frequencyPenalty = _ks.id('frequencyPenalty').value || '';
-				this.presencePenalty = _ks.id('presencePenalty').value || '';*/
+				this.model = _doc.id('model').value || '';
+				this.temperature = _doc.id('temperature').value || '';
+				this.maxTokens = _doc.id('maxTokens').value || '';
+				this.topP = _doc.id('topP').value || '';
+				this.frequencyPenalty = _doc.id('frequencyPenalty').value || '';
+				this.presencePenalty = _doc.id('presencePenalty').value || '';*/
 			constructor(title = "New chat", date = new Date(),
 						apiEndpoint = "https://api.openai.com/v1/chat/completions",
 						model = "gpt-4-1106-preview",
@@ -574,27 +574,27 @@
 			
 			render() {
 				// web-app-level metadata
-				_ks.id('chat-title').value = this.titleOrPlaceholder();
-				_ks.id('chat-date').innerText = this.date || '';
+				_doc.id('chat-title').value = this.titleOrPlaceholder();
+				_doc.id('chat-date').innerText = this.date || '';
 				
 				// load API-level metadata
-				_ks.id('apiEndpoint').value = this.apiEndpoint || '';
+				_doc.id('apiEndpoint').value = this.apiEndpoint || '';
 				
-				_ks.id('model').value = this.model || '';
-				_ks.id('temperature').value = this.temperature || '';
-				_ks.id('maxTokens').value = this.maxTokens || '';
-				_ks.id('topP').value = this.topP || '';
-				_ks.id('frequencyPenalty').value = this.frequencyPenalty || '';
-				_ks.id('presencePenalty').value = this.presencePenalty || '';
+				_doc.id('model').value = this.model || '';
+				_doc.id('temperature').value = this.temperature || '';
+				_doc.id('maxTokens').value = this.maxTokens || '';
+				_doc.id('topP').value = this.topP || '';
+				_doc.id('frequencyPenalty').value = this.frequencyPenalty || '';
+				_doc.id('presencePenalty').value = this.presencePenalty || '';
 				
-				_ks.id('systemMessage').value = this.systemMessage || '';
+				_doc.id('systemMessage').value = this.systemMessage || '';
 				
 				// load actual chat
 				this.renderChatMessages();
 			}
 			
 			renderChatMessages() {
-				var chatTable = _ks.id("chatTable");
+				var chatTable = _doc.id("chatTable");
 				
 				// Clear existing rows in the table
 				chatTable.innerHTML = "";
@@ -613,7 +613,7 @@
 					contentCell.appendChild(div);
 				});
 				
-				_ks.id("enterButton").classList.remove('waiting-spinner');
+				_doc.id("enterButton").classList.remove('waiting-spinner');
 			}
 			
 			setMessages(allMessages) {
@@ -627,14 +627,14 @@
 			}
 			
 			settingsChanged() {
-				this.apiEndpoint = _ks.id('apiEndpoint').value || '';
+				this.apiEndpoint = _doc.id('apiEndpoint').value || '';
 				
-				this.model = _ks.id('model').value || '';
-				this.temperature = _ks.id('temperature').value || '';
-				this.maxTokens = _ks.id('maxTokens').value || '';
-				this.topP = _ks.id('topP').value || '';
-				this.frequencyPenalty = _ks.id('frequencyPenalty').value || '';
-				this.presencePenalty = _ks.id('presencePenalty').value || '';
+				this.model = _doc.id('model').value || '';
+				this.temperature = _doc.id('temperature').value || '';
+				this.maxTokens = _doc.id('maxTokens').value || '';
+				this.topP = _doc.id('topP').value || '';
+				this.frequencyPenalty = _doc.id('frequencyPenalty').value || '';
+				this.presencePenalty = _doc.id('presencePenalty').value || '';
 				
 				saveChatToStorage(this);
 			}
@@ -675,11 +675,11 @@
 				
 				// Bold
 				text = text.replace(/\*\*(.*?)\*\*/gms, "<strong>$1</strong>");
-				text = text.replace(/__ks.id(.*?)__/gms, "<strong>$1</strong>");
+				text = text.replace(/__doc.id(.*?)__/gms, "<strong>$1</strong>");
 				
 				// Italic
 				text = text.replace(/\*([^\*]*?)\*/gms, "<em>$1</em>");
-				text = text.replace(/_ks.id([^_]*?)_/gms, "<em>$1</em>");
+				text = text.replace(/_doc.id([^_]*?)_/gms, "<em>$1</em>");
 				
 				// Restore the original code blocks
 				codeBlocks.forEach((codeBlock, index) => {
@@ -778,7 +778,7 @@
 			chatsData.sort((a, b) => new Date(b.date) - new Date(a.date));
 			
 			// Get the table element
-			var chatsTable = _ks.id("chats");
+			var chatsTable = _doc.id("chats");
 			
 			// Clear existing rows in the table
 			chatsTable.innerHTML = "";
@@ -845,7 +845,7 @@
 		}
 		
 		function resetUserInputField() {
-			const field = _ks.id("userMessage");
+			const field = _doc.id("userMessage");
 			field.value = "";
 			field.rows = 1;
 		}
@@ -860,7 +860,7 @@
 		}
 		
 		function titleUpdated() {
-			document.currentChatObject.setTitle(_ks.id("chat-title").value);
+			document.currentChatObject.setTitle(_doc.id("chat-title").value);
 			saveChatToStorage(document.currentChatObject);
 		}
 		
@@ -868,7 +868,7 @@
 			document.currentChatObject.settingsChanged();
 		}
 		
-		class _ks {
+		class _doc {
 			static id(id) {
 				return document.getElementById(id);
 			}
@@ -893,7 +893,7 @@
 			initializeApiKeyFromStorage();
 			
 			// Auto-resize text entry field as rows are added
-			_ks.id('userMessage').addEventListener('input', function () {
+			_doc.id('userMessage').addEventListener('input', function () {
 				this.rows = this.value.split('\n').length || 1;
 			});
 		};
