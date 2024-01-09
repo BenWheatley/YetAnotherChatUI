@@ -162,7 +162,7 @@
 			margin-bottom: 20px;
 		}
 		
-		td {
+		th, td {
 			padding: 10px;
 			border: 1px solid #ddd;
 			text-align: left;
@@ -311,44 +311,46 @@
 		<h2>Chat Session (stored locally)</h2>
 		<div class="group">
 			<h3>Settings</h3>
+			
 			<button class="hideButton" onclick="toggleSettings();">▲</button>
 			
 			<table class="form-table" id="settings">
+				<tr><th colspan="2">These will be copied into any new chats</th></tr>
 				<tr>
 					<td class="label-col"><label for="apiKey">API Key:</label></td>
 					<td class="input-col"><input type="text" id="apiKey" placeholder="Enter API Key" oninput="saveApiKeyToStorage();"></td>
 				</tr>
 				<tr>
 					<td class="label-col"><label for="apiEndpoint">API endpoint:</label></td>
-					<td class="input-col"><input type="text" id="apiEndpoint" placeholder="https://api.openai.com/v1/chat/completions"></td>
+					<td class="input-col"><input type="text" id="apiEndpoint" placeholder="https://api.openai.com/v1/chat/completions" oninput="settingsChanges();"></td>
 				</tr>
 				<tr>
 					<td class="label-col"><label for="model">Model:</label></td>
-					<td class="input-col"><input type="text" id="model" placeholder="gpt-4-1106-preview"></td>
+					<td class="input-col"><input type="text" id="model" placeholder="gpt-4-1106-preview" oninput="settingsChanges();"></td>
 				</tr>
 				<tr>
 					<td class="label-col"><label for="temperature">Temperature:</label></td>
-					<td class="input-col"><input type="number" id="temperature" step="0.1" placeholder="1"></td>
+					<td class="input-col"><input type="number" id="temperature" step="0.1" placeholder="1" oninput="settingsChanges();"></td>
 				</tr>
 				<tr>
 					<td class="label-col"><label for="maxTokens">Max Tokens:</label></td>
-					<td class="input-col"><input type="number" id="maxTokens" placeholder="256"></td>
+					<td class="input-col"><input type="number" id="maxTokens" placeholder="256" oninput="settingsChanges();"></td>
 				</tr>
 				<tr>
 					<td class="label-col"><label for="topP">Top P:</label></td>
-					<td class="input-col"><input type="number" id="topP" step="0.1" placeholder="1"></td>
+					<td class="input-col"><input type="number" id="topP" step="0.1" placeholder="1" oninput="settingsChanges();"></td>
 				</tr>
 				<tr>
 					<td class="label-col"><label for="frequencyPenalty">Frequency Penalty:</label></td>
-					<td class="input-col"><input type="number" id="frequencyPenalty" step="0.1" placeholder="0"></td>
+					<td class="input-col"><input type="number" id="frequencyPenalty" step="0.1" placeholder="0" oninput="settingsChanges();"></td>
 				</tr>
 				<tr>
 					<td class="label-col"><label for="presencePenalty">Presence Penalty:</label></td>
-					<td class="input-col"><input type="number" id="presencePenalty" step="0.1" placeholder="0"></td>
+					<td class="input-col"><input type="number" id="presencePenalty" step="0.1" placeholder="0" oninput="settingsChanges();"></td>
 				</tr>
 				<tr>
 					<td class="label-col"><label for="systemMessage">System message:</label></td>
-					<td class="input-col"><input type="text" id="systemMessage" placeholder="You are a helpful assistant."></td>
+					<td class="input-col"><input type="text" id="systemMessage" placeholder="You are a helpful assistant." oninput="settingsChanges();"></td>
 				</tr>
 			</table>
 		</div>
@@ -608,6 +610,19 @@
 				this.generalUpdate();
 			}
 			
+			settingsChanged() {
+				this.apiEndpoint = document.getElementById('apiEndpoint').value || '';
+			
+				this.model = document.getElementById('model').value || '';
+				this.temperature = document.getElementById('temperature').value || '';
+				this.maxTokens = document.getElementById('maxTokens').value || '';
+				this.topP = document.getElementById('topP').value || '';
+				this.frequencyPenalty = document.getElementById('frequencyPenalty').value || '';
+				this.presencePenalty = document.getElementById('presencePenalty').value || '';
+				
+				saveChatToStorage(this);
+			}
+			
 			generalUpdate() {
 				saveChatToStorage(this);
 				this.renderChatMessages();
@@ -831,6 +846,10 @@
 		function titleUpdated() {
 			document.currentChatObject.setTitle(document.getElementById("chat-title").value);
 			saveChatToStorage(document.currentChatObject);
+		}
+		
+		function settingsChanges() {
+			document.currentChatObject.settingsChanged();
 		}
 		
 		// Load and configure everything when the page loads
