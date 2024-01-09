@@ -416,7 +416,7 @@
 				"role": "user",
 				"content": newUserMessageString
 			};
-			if (document.currentChatObject == null) { startNewChat }
+			if (document.currentChatObject == null) { startNewChat(); }
 			var existingMessages = document.currentChatObject.messages;
 			var allMessages = existingMessages.concat(newUserMessage);
 			
@@ -706,7 +706,7 @@
 			
 			if (document.currentChatObject == undefined ||
 				(document.currentChatObject.date == chatObject.date)) {
-				startNewChat
+				startNewChat();
 			}
 		}
 		
