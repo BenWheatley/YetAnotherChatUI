@@ -369,7 +369,7 @@
 	
 	<script>
 		function toggleSettings() {
-			var settings = document.getElementById('settings');
+			var settings = _('settings');
 			settings.classList.toggle('hidden');
 			
 			// Get the button element
@@ -383,7 +383,7 @@
 		
 		function preloadSettingsUIState() {
 			if (localStorage.getItem('settings-hidden') == 'true' /* true != 'true'; so 'thanks' JS */) {
-				document.getElementById('settings').classList.add('hidden');
+				_('settings').classList.add('hidden');
 			}
 		}
 		
@@ -396,30 +396,30 @@
 		}
 		
 		function saveApiKeyToStorage() {
-			var apiKeyValue = document.getElementById('apiKey').value;
+			var apiKeyValue = _('apiKey').value;
 			localStorage.setItem('apiKey', apiKeyValue);
 		}
 		
 		function initializeApiKeyFromStorage() {
-			var apiKeyInput = document.getElementById('apiKey');
+			var apiKeyInput = _('apiKey');
 			apiKeyInput.value = localStorage.getItem('apiKey') || '';
 		}
 		
 		function sendMessage() {
 			// Get API key or fast fail
-			var apiKeyInput = document.getElementById('apiKey').value;
+			var apiKeyInput = _('apiKey').value;
 			if (apiKeyInput == null || apiKeyInput == "") {
 				alert("You need an API key for this to work; contact your preferred model provider if you don't have one.");
 				return;
 			}
 			
 			// Get the user's message from the input field
-			var newUserMessageString = document.getElementById("userMessage").value;
+			var newUserMessageString = _("userMessage").value;
 			if (newUserMessageString == null) {
 				return; // don't waste calls (though I may want to experiment with this later)
 			}
 			
-			document.getElementById("enterButton").classList.add('waiting-spinner');
+			_("enterButton").classList.add('waiting-spinner');
 			
 			// Create a new message object for the user and append to existing messages
 			var newUserMessage = {
@@ -512,16 +512,28 @@
 		}
 		
 		function extractFrom(elementId, parser) {
-			var element = document.getElementById(elementId);
+			var element = _(elementId);
 			var value = element.value || element.placeholder;
 			return parser(value);
 		}
 		
 		class ChatObject {
-			constructor(title = "New chat", date = new Date(), apiEndpoint = "",
-						model = "", temperature = 0, maxTokens = 256,
+		/* copy from here if possible?
+				this.apiEndpoint = _('apiEndpoint').value || '';
+				
+				this.model = _('model').value || '';
+				this.temperature = _('temperature').value || '';
+				this.maxTokens = _('maxTokens').value || '';
+				this.topP = _('topP').value || '';
+				this.frequencyPenalty = _('frequencyPenalty').value || '';
+				this.presencePenalty = _('presencePenalty').value || '';*/
+			constructor(title = "New chat", date = new Date(),
+						apiEndpoint = "https://api.openai.com/v1/chat/completions",
+						model = "gpt-4-1106-preview",
+						temperature = 1, maxTokens = 256,
 						topP = 1, frequencyPenalty = 0, presencePenalty = 0,
-						messages = [], uuid = crypto.randomUUID()) {
+						messages = [], systemMessage = "You are a helpful assistant.",
+						uuid = crypto.randomUUID()) {
 				// Metadata
 				// Not user facing
 				this.uuid = uuid || crypto.randomUUID();
@@ -537,6 +549,7 @@
 				this.frequencyPenalty = frequencyPenalty;
 				this.presencePenalty = presencePenalty;
 				this.messages = messages;
+				this.systemMessage = systemMessage;
 			}
 			
 			static createFromJson(json) {
@@ -560,25 +573,27 @@
 			
 			render() {
 				// web-app-level metadata
-				document.getElementById('chat-title').value = this.titleOrPlaceholder();
-				document.getElementById('chat-date').innerText = this.date || '';
+				_('chat-title').value = this.titleOrPlaceholder();
+				_('chat-date').innerText = this.date || '';
 				
 				// load API-level metadata
-				document.getElementById('apiEndpoint').value = this.apiEndpoint || '';
+				_('apiEndpoint').value = this.apiEndpoint || '';
 				
-				document.getElementById('model').value = this.model || '';
-				document.getElementById('temperature').value = this.temperature || '';
-				document.getElementById('maxTokens').value = this.maxTokens || '';
-				document.getElementById('topP').value = this.topP || '';
-				document.getElementById('frequencyPenalty').value = this.frequencyPenalty || '';
-				document.getElementById('presencePenalty').value = this.presencePenalty || '';
+				_('model').value = this.model || '';
+				_('temperature').value = this.temperature || '';
+				_('maxTokens').value = this.maxTokens || '';
+				_('topP').value = this.topP || '';
+				_('frequencyPenalty').value = this.frequencyPenalty || '';
+				_('presencePenalty').value = this.presencePenalty || '';
+				
+				_('systemMessage').value = this.systemMessage || '';
 				
 				// load actual chat
 				this.renderChatMessages();
 			}
 			
 			renderChatMessages() {
-				var chatTable = document.getElementById("chatTable");
+				var chatTable = _("chatTable");
 				
 				// Clear existing rows in the table
 				chatTable.innerHTML = "";
@@ -597,7 +612,7 @@
 					contentCell.appendChild(div);
 				});
 				
-				document.getElementById("enterButton").classList.remove('waiting-spinner');
+				_("enterButton").classList.remove('waiting-spinner');
 			}
 			
 			setMessages(allMessages) {
@@ -611,14 +626,14 @@
 			}
 			
 			settingsChanged() {
-				this.apiEndpoint = document.getElementById('apiEndpoint').value || '';
-			
-				this.model = document.getElementById('model').value || '';
-				this.temperature = document.getElementById('temperature').value || '';
-				this.maxTokens = document.getElementById('maxTokens').value || '';
-				this.topP = document.getElementById('topP').value || '';
-				this.frequencyPenalty = document.getElementById('frequencyPenalty').value || '';
-				this.presencePenalty = document.getElementById('presencePenalty').value || '';
+				this.apiEndpoint = _('apiEndpoint').value || '';
+				
+				this.model = _('model').value || '';
+				this.temperature = _('temperature').value || '';
+				this.maxTokens = _('maxTokens').value || '';
+				this.topP = _('topP').value || '';
+				this.frequencyPenalty = _('frequencyPenalty').value || '';
+				this.presencePenalty = _('presencePenalty').value || '';
 				
 				saveChatToStorage(this);
 			}
@@ -762,7 +777,7 @@
 			chatsData.sort((a, b) => new Date(b.date) - new Date(a.date));
 			
 			// Get the table element
-			var chatsTable = document.getElementById("chats");
+			var chatsTable = _("chats");
 			
 			// Clear existing rows in the table
 			chatsTable.innerHTML = "";
@@ -829,7 +844,7 @@
 		}
 		
 		function resetUserInputField() {
-			const field = document.getElementById("userMessage");
+			const field = _("userMessage");
 			field.value = "";
 			field.rows = 1;
 		}
@@ -844,12 +859,17 @@
 		}
 		
 		function titleUpdated() {
-			document.currentChatObject.setTitle(document.getElementById("chat-title").value);
+			document.currentChatObject.setTitle(_("chat-title").value);
 			saveChatToStorage(document.currentChatObject);
 		}
 		
 		function settingsChanges() {
 			document.currentChatObject.settingsChanged();
+		}
+		
+		function _(id) {
+			// It's like jQuery's $(), but not
+			return document.getElementById(id);
 		}
 		
 		// Load and configure everything when the page loads
@@ -871,7 +891,7 @@
 			initializeApiKeyFromStorage();
 			
 			// Auto-resize text entry field as rows are added
-			document.getElementById('userMessage').addEventListener('input', function () {
+			_('userMessage').addEventListener('input', function () {
 				this.rows = this.value.split('\n').length || 1;
 			});
 		};
