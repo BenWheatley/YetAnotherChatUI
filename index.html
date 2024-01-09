@@ -310,7 +310,7 @@
 			<table class="form-table" id="settings">
 				<tr>
 					<td class="label-col"><label for="apiKey">API Key:</label></td>
-					<td class="input-col"><input type="text" id="apiKey" placeholder="Enter API Key"></td>
+					<td class="input-col"><input type="text" id="apiKey" placeholder="Enter API Key" oninput="saveApiKeyToStorage();"></td>
 				</tr>
 				<tr>
 					<td class="label-col"><label for="apiEndpoint">API endpoint:</label></td>
@@ -348,7 +348,7 @@
 		</div>
 		<div id="chat-title-container">
 			<span id="chat-date"></span>
-			<input type="text" id="chat-title" placeholder="Chat title">
+			<input type="text" id="chat-title" placeholder="Chat title" oninput="titleUpdated();">
 		</div>
 		
 		<table id="chatTable"></table>
@@ -594,8 +594,17 @@
 			
 			setMessages(allMessages) {
 				this.messages = allMessages;
-				this.renderChatMessages();
+				this.generalUpdate();
+			}
+			
+			setTitle(newTitle) {
+				this.title = newTitle;
+				this.generalUpdate();
+			}
+			
+			generalUpdate() {
 				saveChatToStorage(this);
+				this.renderChatMessages();
 			}
 			
 			renderTextForTable(text) {
@@ -691,6 +700,7 @@
 		function saveTheseChats(chatsData) {
 			// Save the updated chatsData to localStorage
 			localStorage.setItem("chats", JSON.stringify(chatsData));
+			renderChatsList();
 		}
 		
 		function loadChat(chatObject) {
@@ -812,7 +822,12 @@
 			}
 		}
 		
-		// Call the function to load chats when the page loads
+		function titleUpdated() {
+			document.currentChatObject.setTitle(document.getElementById("chat-title").value);
+			saveChatToStorage(document.currentChatObject);
+		}
+		
+		// Load and configure everything when the page loads
 		window.onload = function () {
 			preloadSettingsUIState();
 			renderChatsList();
@@ -829,9 +844,6 @@
 			
 			// API key:
 			initializeApiKeyFromStorage();
-			// Add an event listener to the input to save the API key when modified
-			var apiKeyInput = document.getElementById('apiKey');
-			apiKeyInput.addEventListener('input', saveApiKeyToStorage);
 			
 			// Auto-resize text entry field as rows are added
 			document.getElementById('userMessage').addEventListener('input', function () {
