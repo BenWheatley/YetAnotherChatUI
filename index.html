@@ -334,6 +334,34 @@
 			from {	transform: rotate(0deg);	}
 			to {	transform: rotate(360deg);	}
 		}
+		
+		#scrollToBottomButton {
+			position: fixed;
+			bottom: 20px;
+			right: 40%;
+			width: 40px;
+			height: 40px;
+			background-color: #f8f8f8;
+			border: 1px solid #aaa;
+			border-radius: 50%;
+			cursor: pointer;
+			box-shadow: 0px 0px 10px white;
+			transition: opacity 0.5s;
+		}
+		
+		#scrollToBottomButton .arrow-down {
+			display: block;
+			width: 0;
+			height: 0;
+			border-left: 10px solid transparent;
+			border-right: 10px solid transparent;
+			border-top: 12px solid #333;
+			margin: 10px auto 0;
+		}
+		
+		.transparent {
+			opacity: 0%;
+		}
 	</style>
 </head>
 <body>
@@ -352,7 +380,7 @@
 		<div id="showHideChatsListButtonImage"></div>
 	</div>
 	
-	<div id="chatSession">
+	<div id="chatSession" onscroll="showHideScrollToBottomButton();">
 		<div>
 			<h2>GDPR stuff</h2>
 			<ol><li>This is intended for technical users only, who understand what all this stuff is and how it works.</li>
@@ -416,6 +444,8 @@
 			<textarea id="userMessage" placeholder="Type your message..." rows="1"></textarea>
 			<button id="enterButton" onclick="sendMessage();">Enter</button>
 		</div>
+		
+		<div id="scrollToBottomButton" onclick="scrollToBottom();"><span class="arrow-down"></span></div>
 	</div>
 	
 	<script>
@@ -924,6 +954,20 @@
 			_doc.id("showHideChatsListButtonImage").classList.toggle('collapsed');
 		}
 		
+		function showHideScrollToBottomButton() {
+			const chatSession = _doc.id('chatSession');
+			const isScrolledToBottom = chatSession.scrollHeight - chatSession.scrollTop === chatSession.clientHeight;
+			if (isScrolledToBottom) {
+				_doc.id('scrollToBottomButton').classList.add('transparent');
+			} else {
+				_doc.id('scrollToBottomButton').classList.remove('transparent');
+			}
+		}
+		
+		function scrollToBottom() {
+			_doc.id("chatSession").scrollTop = chatSession.scrollHeight;
+		}
+		
 		class _doc {
 			static id(id) {
 				return document.getElementById(id);
@@ -953,7 +997,7 @@
 				this.rows = this.value.split('\n').length || 1;
 			});
 		};
-
+		
 	</script>
 </body>
 </html>
