@@ -626,15 +626,6 @@
 		}
 		
 		class ChatObject {
-		/* copy from here if possible?
-				this.apiEndpoint = _doc.id('apiEndpoint').value || '';
-				
-				this.model = _doc.id('model').value || '';
-				this.temperature = _doc.id('temperature').value || '';
-				this.maxTokens = _doc.id('maxTokens').value || '';
-				this.topP = _doc.id('topP').value || '';
-				this.frequencyPenalty = _doc.id('frequencyPenalty').value || '';
-				this.presencePenalty = _doc.id('presencePenalty').value || '';*/
 			constructor(title = "New chat", date = new Date(),
 						apiEndpoint = "https://api.openai.com/v1/chat/completions",
 						model = "gpt-4-1106-preview",
@@ -658,6 +649,25 @@
 				this.presencePenalty = presencePenalty;
 				this.messages = messages;
 				this.systemMessage = systemMessage;
+			}
+			
+			static createFromCurrentSettings() {
+				var apiEndpoint = extractFrom("apiEndpoint", String);
+				
+				var model = extractFrom("model", String) || "";
+				var temperature = extractFrom("temperature", parseFloat) || 1;
+				var maxTokens = extractFrom("maxTokens", parseInt) || 256;
+				var topP = extractFrom("topP", parseFloat) || 1;
+				var frequencyPenalty = extractFrom("frequencyPenalty", parseFloat) || 0;
+				var presencePenalty = extractFrom("presencePenalty", parseFloat) || 0;
+				var systemMessage = extractFrom("systemMessage", String) || "You are a helpful assistant.";
+				
+				return new ChatObject(
+						"New chat", new Date(), apiEndpoint,
+						model, temperature, maxTokens,
+						topP, frequencyPenalty, presencePenalty,
+						[], systemMessage,
+						crypto.randomUUID());
 			}
 			
 			static createFromJson(json) {
@@ -949,7 +959,7 @@
 		}
 		
 		function startNewChat() {
-			loadChat(new ChatObject());
+			loadChat(ChatObject.createFromCurrentSettings());
 		}
 		
 		function resetUserInputField() {
