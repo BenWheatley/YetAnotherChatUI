@@ -57,6 +57,12 @@
 			border-radius: 5px;
 		}
 		
+		#showHideChatsListButtonImage::before {
+			content: "‖";
+			font-size: 30px;
+			color: #555;
+		}
+		
 		#showHideChatsListButtonImage.collapsed {
 			border-top: 1px solid #ddd;
 			border-bottom: 1px solid #ddd;
@@ -279,8 +285,15 @@
 			padding: 5px;
 		}
 		
-		input[type="text"] {
-			width: 90%;
+		input[type="text"], input[type="password"] {
+			width: calc(100% - 10px);
+		}
+		
+		#showHideApiKeyButton {
+			width: 70px;
+			margin-left: 10px;
+			padding: 0px;
+			height: 20px;
 		}
 		
 		#user-input-row {
@@ -300,7 +313,7 @@
 			background: #f8f8ff;
 		}
 		
-		.hideButton {
+		.showHideSettingsButton {
 			position: absolute;
 			top: -4px;
 			right: 0;
@@ -391,13 +404,16 @@
 		<div class="group">
 			<h3>Settings</h3>
 			
-			<button class="hideButton" onclick="toggleSettings();">▲</button>
+			<button class="showHideSettingsButton" onclick="toggleSettings();">▲</button>
 			
 			<table class="form-table" id="settings">
 				<tr><th colspan="2">These will be copied into any new chats</th></tr>
 				<tr>
 					<td class="label-col"><label for="apiKey">API Key:</label></td>
-					<td class="input-col"><input type="text" id="apiKey" placeholder="Enter API Key" oninput="saveApiKeyToStorage();"></td>
+					<td class="input-col" style="display: flex;">
+						<input type="password" id="apiKey" placeholder="Enter API Key" oninput="saveApiKeyToStorage();">
+						<button id="showHideApiKeyButton" onclick="showHideApiKey();">Reveal</button>
+					</td>
 				</tr>
 				<tr>
 					<td class="label-col"><label for="apiEndpoint">API endpoint:</label></td>
@@ -454,7 +470,7 @@
 			settings.classList.toggle('hidden');
 			
 			// Get the button element
-			var button = document.querySelector('.hideButton');
+			var button = document.querySelector('.showHideSettingsButton');
 			
 			// Update button content based on the state of the settings element
 			button.innerHTML = settings.classList.contains('hidden') ? '▼' : '▲';
@@ -484,6 +500,17 @@
 		function initializeApiKeyFromStorage() {
 			var apiKeyInput = _doc.id('apiKey');
 			apiKeyInput.value = localStorage.getItem('apiKey') || '';
+		}
+		
+		function showHideApiKey() {
+			var newText = "Reveal";
+			var newType = "password";
+			if (_doc.id("apiKey").type == newType) {
+				newType = "text";
+				newText = "Hide";
+			}
+			_doc.id("apiKey").type = newType;
+			_doc.id("showHideApiKeyButton").innerText = newText;
 		}
 		
 		function sendMessage() {
