@@ -284,7 +284,8 @@
 			white-space: pre;
 			font-family: monospace;
 			padding: 5px;
-			width: 0px;
+			width: 0px; /* Goes with (parent overflow-x: scroll); still looks a bit weird (just less so),
+			and I don't understand the css rules that lead to this solving the problem I wanted to solve */
 		}
 		
 		input[type="text"], input[type="password"] {
