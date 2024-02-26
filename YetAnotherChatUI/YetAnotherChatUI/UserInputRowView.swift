@@ -17,10 +17,6 @@ struct UserInputRowView: View {
 				.border(Color.gray)
 			Button(action: {}) {
 				Text("Enter")
-					.padding()
-					.background(Color.green)
-					.foregroundColor(.white)
-					.cornerRadius(5)
 			}
 		}
 	}

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ChatsListView: View {
-	var isVisible: Bool
+	@State var isVisible: Bool
 
 	var body: some View {
 		VStack {
@@ -21,7 +21,7 @@ struct ChatsListView: View {
 				// Populate dynamically
 			}
 		}
-		.frame(width: 200)
+		.frame(width: isVisible ? 200 : 10)
 		.transition(.slide)
 	}
 }

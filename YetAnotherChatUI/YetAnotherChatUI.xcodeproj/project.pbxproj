@@ -19,6 +19,7 @@
 		B5376A672B8BD825007B3A7A /* ChatTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5376A662B8BD825007B3A7A /* ChatTitleView.swift */; };
 		B5376A692B8BD899007B3A7A /* UserInputRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5376A682B8BD899007B3A7A /* UserInputRowView.swift */; };
 		B5376A6B2B8BD8B5007B3A7A /* ScrollToBottomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5376A6A2B8BD8B5007B3A7A /* ScrollToBottomButton.swift */; };
+		B5376A6D2B8CC908007B3A7A /* GDPRView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5376A6C2B8CC908007B3A7A /* GDPRView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		B5376A662B8BD825007B3A7A /* ChatTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTitleView.swift; sourceTree = "<group>"; };
 		B5376A682B8BD899007B3A7A /* UserInputRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInputRowView.swift; sourceTree = "<group>"; };
 		B5376A6A2B8BD8B5007B3A7A /* ScrollToBottomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollToBottomButton.swift; sourceTree = "<group>"; };
+		B5376A6C2B8CC908007B3A7A /* GDPRView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDPRView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 				B5376A4F2B8BD51B007B3A7A /* ChatSessionView.swift */,
 				B5376A602B8BD7BB007B3A7A /* ChatsListView.swift */,
 				B5376A622B8BD7E5007B3A7A /* ChatSessionContentView.swift */,
+				B5376A6C2B8CC908007B3A7A /* GDPRView.swift */,
 				B5376A662B8BD825007B3A7A /* ChatTitleView.swift */,
 				B5376A682B8BD899007B3A7A /* UserInputRowView.swift */,
 				B5376A6A2B8BD8B5007B3A7A /* ScrollToBottomButton.swift */,
@@ -164,6 +167,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B5376A652B8BD808007B3A7A /* SettingsView.swift in Sources */,
+				B5376A6D2B8CC908007B3A7A /* GDPRView.swift in Sources */,
 				B5376A692B8BD899007B3A7A /* UserInputRowView.swift in Sources */,
 				B5376A6B2B8BD8B5007B3A7A /* ScrollToBottomButton.swift in Sources */,
 				B5376A502B8BD51B007B3A7A /* ChatSessionView.swift in Sources */,

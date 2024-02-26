@@ -9,22 +9,22 @@ import SwiftUI
 
 struct ChatSessionContentView: View {
 	@ObservedObject var viewModel: ChatSessionViewModel
-
+	
 	var body: some View {
 		VStack {
-			// ... rest of your HTML content goes here
+			GDPRView()
 			
 			SettingsView(viewModel: viewModel)
-
+			
 			ChatTitleView(title: $viewModel.chatTitle)
-
+			
 			// Chat Table
 			List {
 				// ... chat messages go here
 			}
-
+			
 			UserInputRowView(message: $viewModel.userMessage)
-
+			
 			if viewModel.isScrollToBottomVisible {
 				ScrollToBottomButton()
 			}

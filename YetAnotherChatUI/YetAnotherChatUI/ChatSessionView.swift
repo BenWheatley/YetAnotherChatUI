@@ -16,9 +16,7 @@ struct ChatSessionView: View {
 	var body: some View {
 		HStack(spacing: 0) {
 			ChatsListView(isVisible: viewModel.isChatsListVisible)
-			
 			ChatSessionContentView(viewModel: viewModel)
-				.background(Color(.windowBackgroundColor))
 		}
 	}
 }
