@@ -9,16 +9,14 @@ import SwiftUI
 
 struct ScrollToBottomButton: View {
 	var body: some View {
-		Button(action: {}) {
+		Button(action: {
+			print("pressed")
+		}) {
 			Image(systemName: "arrow.down.circle.fill")
-				.resizable()
-				.frame(width: 40, height: 40)
-				.background(Color.white)
-				.clipShape(Circle())
-				.overlay(Circle().stroke(Color.gray, lineWidth: 1))
+				.imageScale(.large)
 		}
-		.padding(.bottom, 20)
-		.transition(.opacity)
+		.padding()
+		.buttonStyle(PlainButtonStyle())
 	}
 }
 

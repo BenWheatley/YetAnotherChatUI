@@ -12,19 +12,7 @@ struct SettingsView: View {
 
 	var body: some View {
 		Group {
-			Text("Settings")
-				.font(.title3)
-			Button(action: {
-				withAnimation {
-					viewModel.isSettingsVisible.toggle()
-				}
-			}) {
-				Text(viewModel.isSettingsVisible ? "▼" : "▲")
-			}
-
-			if viewModel.isSettingsVisible {
-				// ... settings form goes here
-			}
+			Text("list of settings")
 		}
 	}
 }

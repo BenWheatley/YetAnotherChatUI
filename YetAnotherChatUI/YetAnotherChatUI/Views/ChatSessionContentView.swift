@@ -14,20 +14,18 @@ struct ChatSessionContentView: View {
 		VStack {
 			GDPRView()
 			
-			SettingsView(viewModel: viewModel)
-			
 			ChatTitleView(title: $viewModel.chatTitle)
 			
-			// Chat Table
-			List {
-				// ... chat messages go here
-			}
-			
-			UserInputRowView(message: $viewModel.userMessage)
-			
-			if viewModel.isScrollToBottomVisible {
+			ZStack(alignment: .bottomTrailing) {
+				List {
+					ForEach(viewModel.messages.indices, id: \.self) { index in
+						ChatMessageView(message: viewModel.messages[index])
+					}
+				}
 				ScrollToBottomButton()
 			}
+			
+			UserInputRowView()
 		}
 		.padding()
 	}
