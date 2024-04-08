@@ -6,10 +6,10 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ChatsListView: View {
-	var listOfChats: [ChatViewModel] = []
-	
+	@Query(sort: \ChatViewModel.lastModified) var listOfChats: [ChatViewModel]
 	var body: some View {
 		VStack {
 			List {

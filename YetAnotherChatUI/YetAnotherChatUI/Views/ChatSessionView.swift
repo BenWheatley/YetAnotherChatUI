@@ -49,5 +49,5 @@ struct ChatSessionView: View {
 
 #Preview {
 	ChatSessionView(viewModel: ChatSessionViewModel())
-		.modelContainer(for: Item.self, inMemory: true)
+		.modelContainer(for: ChatSessionViewModel.self, inMemory: true)
 }

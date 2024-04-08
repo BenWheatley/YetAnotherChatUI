@@ -16,5 +16,5 @@ struct ChatListRowView: View {
 }
 
 #Preview {
-	ChatListRowView(chat: ChatViewModel(title: "Example chat", lastModified: .now, chatSesssion: ChatSessionViewModel()))
+	ChatListRowView(chat: ChatViewModel(title: "Example chat", lastModified: .now, chatSession: ChatSessionViewModel()))
 }

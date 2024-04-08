@@ -6,10 +6,18 @@
 //
 
 import Foundation
+import SwiftData
 
-struct ChatViewModel {
-	let title: String
-	let lastModified: Date
+@Model
+class ChatViewModel {
+	var title: String
+	var lastModified: Date
 	
-	let chatSesssion: ChatSessionViewModel
+	var chatSession: ChatSessionViewModel
+	
+	init(title: String, lastModified: Date, chatSession: ChatSessionViewModel) {
+		self.title = title
+		self.lastModified = lastModified
+		self.chatSession = chatSession
+	}
 }
