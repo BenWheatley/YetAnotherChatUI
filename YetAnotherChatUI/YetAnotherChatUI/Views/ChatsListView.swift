@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct ChatsListView: View {
-	@Query(sort: \ChatViewModel.lastModified) var listOfChats: [ChatViewModel]
+	@Query(sort: \ChatSession.lastModified) var listOfChats: [ChatSession]
 	var body: some View {
 		VStack {
 			List {

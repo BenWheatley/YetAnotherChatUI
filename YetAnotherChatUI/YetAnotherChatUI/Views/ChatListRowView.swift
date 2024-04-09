@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct ChatListRowView: View {
-	var chat: ChatViewModel
+	var chat: ChatSession
 	
     var body: some View {
-		Text(chat.title)
+		Text(chat.chatTitle)
     }
 }
 
 #Preview {
-	ChatListRowView(chat: ChatViewModel(title: "Example chat", lastModified: .now, chatSession: ChatSessionViewModel()))
+	ChatListRowView(chat: ChatSession())
 }

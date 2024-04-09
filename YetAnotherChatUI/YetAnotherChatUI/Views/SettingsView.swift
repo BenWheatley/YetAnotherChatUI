@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-	@ObservedObject var viewModel: ChatSessionViewModel
+	@ObservedObject var settings: ChatSettings
 	@Environment(\.dismiss) var dismiss
 	
 	let formatter: NumberFormatter = {
@@ -39,39 +39,39 @@ struct SettingsView: View {
 			Grid {
 				GridRow {
 					Text("API Endpoint:")
-					TextField("", text: $viewModel.settings.apiEndpoint)
+					TextField("", text: $settings.apiEndpoint)
 				}
 				GridRow {
 					Text("Model:")
-					TextField("", text: $viewModel.settings.model)
+					TextField("", text: $settings.model)
 				}
 				GridRow {
 					Text("Temperature:")
-					Slider(value: $viewModel.settings.temperature, in: 0...5)
-					Text("\(viewModel.settings.temperature)")
+					Slider(value: $settings.temperature, in: 0...5)
+					Text("\(settings.temperature)")
 				}
 				GridRow {
 					Text("Maximum number of tokens:")
-					TextField("", value: $viewModel.settings.maxTokens, formatter: formatter)
+					TextField("", value: $settings.maxTokens, formatter: formatter)
 				}
 				GridRow {
 					Text("top_p:")
-					Slider(value: $viewModel.settings.topP, in: 0...1)
-					Text("\(viewModel.settings.topP)")
+					Slider(value: $settings.topP, in: 0...1)
+					Text("\(settings.topP)")
 				}
 				GridRow {
 					Text("Frequency penalty:")
-					Slider(value: $viewModel.settings.frequencyPenalty, in: -2.0...2.0)
-					Text("\(viewModel.settings.frequencyPenalty)")
+					Slider(value: $settings.frequencyPenalty, in: -2.0...2.0)
+					Text("\(settings.frequencyPenalty)")
 				}
 				GridRow {
 					Text("Presence penalty:")
-					Slider(value: $viewModel.settings.presencePenalty, in: -2.0...2.0)
-					Text("\(viewModel.settings.presencePenalty)")
+					Slider(value: $settings.presencePenalty, in: -2.0...2.0)
+					Text("\(settings.presencePenalty)")
 				}
 				GridRow {
 					Text("System message:")
-					TextEditor(text: $viewModel.settings.systemMessage)
+					TextEditor(text: $settings.systemMessage)
 						.frame(height: 140)
 					
 				}
@@ -83,5 +83,5 @@ struct SettingsView: View {
 }
 
 #Preview {
-	SettingsView(viewModel: ChatSessionViewModel())
+	SettingsView(settings: .defaultSettings)
 }

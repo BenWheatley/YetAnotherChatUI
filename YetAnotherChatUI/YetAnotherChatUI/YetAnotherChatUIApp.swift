@@ -12,7 +12,7 @@ import SwiftData
 struct YetAnotherChatUIApp: App {
 	var sharedModelContainer: ModelContainer = {
 		let schema = Schema([
-			ChatViewModel.self
+			ChatSession.self
 		])
 		let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 		
@@ -25,7 +25,7 @@ struct YetAnotherChatUIApp: App {
 	
 	var body: some Scene {
 		WindowGroup {
-			ChatSessionView(viewModel: ChatSessionViewModel())
+			ChatSessionView()
 		}
 		.modelContainer(sharedModelContainer)
 	}

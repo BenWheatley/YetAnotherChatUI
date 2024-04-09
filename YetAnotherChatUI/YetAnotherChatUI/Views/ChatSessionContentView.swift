@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ChatSessionContentView: View {
-	@ObservedObject var viewModel: ChatSessionViewModel
+	@ObservedObject var viewModel: ChatSession
 	
 	var body: some View {
 		VStack {
@@ -32,5 +32,5 @@ struct ChatSessionContentView: View {
 }
 
 #Preview {
-	ChatSessionContentView(viewModel: ChatSessionViewModel())
+	ChatSessionContentView(viewModel: ChatSession())
 }

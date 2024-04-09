@@ -11,8 +11,11 @@ import SwiftData
 import SwiftUI
 
 struct ChatSessionView: View {
-	@ObservedObject var viewModel: ChatSessionViewModel
+	@Query(sort: \ChatSession.lastModified) var listOfChats: [ChatSession]
+
 	@State private var isSettingsVisible = false
+	
+	@Environment(\.modelContext) private var swiftDataModelContext
 	
 	var body: some View {
 		NavigationView {
@@ -20,17 +23,18 @@ struct ChatSessionView: View {
 				ChatsListView()
 			}
 			Section {
-				ChatSessionContentView(viewModel: viewModel)
+				let mostRecentlyEditedChat = listOfChats.first ?? makeNewChatSession()
+				ChatSessionContentView(viewModel: mostRecentlyEditedChat)
 			}
 		}
 		.listStyle(SidebarListStyle())
 		.navigationTitle("Chat session")
 		.toolbar {
 			ToolbarItem {
-				Button(action: {}) {
+				Button(action: { _ = makeNewChatSession() }, label: {
 					Image(systemName: "doc.badge.plus")
 						.imageScale(.large)
-				}
+				})
 			}
 			ToolbarItem {
 				Button(action: {
@@ -42,12 +46,20 @@ struct ChatSessionView: View {
 			}
 		}
 		.sheet(isPresented: $isSettingsVisible) {
-			SettingsView(viewModel: viewModel)
+			if let mostRecentlyEditedChat = listOfChats.first {
+				SettingsView(settings: mostRecentlyEditedChat.settings)
+			}
 		}
+	}
+	
+	func makeNewChatSession() -> ChatSession {
+		let chatSession = ChatSession(chatTitle: "New chat", messages: [], settings: .savedSettings)
+		swiftDataModelContext.insert(chatSession)
+		return chatSession
 	}
 }
 
 #Preview {
-	ChatSessionView(viewModel: ChatSessionViewModel())
-		.modelContainer(for: ChatSessionViewModel.self, inMemory: true)
+	ChatSessionView()
+		.modelContainer(for: ChatSession.self, inMemory: true)
 }
