@@ -12,7 +12,6 @@
 		B5376A542B8BD51C007B3A7A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5376A532B8BD51C007B3A7A /* Assets.xcassets */; };
 		B5376A582B8BD51C007B3A7A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5376A572B8BD51C007B3A7A /* Preview Assets.xcassets */; };
 		B5376A5F2B8BD79C007B3A7A /* ChatSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5376A5E2B8BD79C007B3A7A /* ChatSession.swift */; };
-		B5376A612B8BD7BB007B3A7A /* ChatsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5376A602B8BD7BB007B3A7A /* ChatsListView.swift */; };
 		B5376A632B8BD7E5007B3A7A /* ChatSessionContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5376A622B8BD7E5007B3A7A /* ChatSessionContentView.swift */; };
 		B5376A652B8BD808007B3A7A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5376A642B8BD808007B3A7A /* SettingsView.swift */; };
 		B5376A672B8BD825007B3A7A /* ChatTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5376A662B8BD825007B3A7A /* ChatTitleView.swift */; };
@@ -33,7 +32,6 @@
 		B5376A552B8BD51C007B3A7A /* YetAnotherChatUI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = YetAnotherChatUI.entitlements; sourceTree = "<group>"; };
 		B5376A572B8BD51C007B3A7A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B5376A5E2B8BD79C007B3A7A /* ChatSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSession.swift; sourceTree = "<group>"; };
-		B5376A602B8BD7BB007B3A7A /* ChatsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsListView.swift; sourceTree = "<group>"; };
 		B5376A622B8BD7E5007B3A7A /* ChatSessionContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSessionContentView.swift; sourceTree = "<group>"; };
 		B5376A642B8BD808007B3A7A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B5376A662B8BD825007B3A7A /* ChatTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTitleView.swift; sourceTree = "<group>"; };
@@ -109,7 +107,6 @@
 			children = (
 				B5376A702B8CE59E007B3A7A /* ChatMessageView.swift */,
 				B5376A4F2B8BD51B007B3A7A /* ChatSessionView.swift */,
-				B5376A602B8BD7BB007B3A7A /* ChatsListView.swift */,
 				B5376A722B8D3D53007B3A7A /* ChatListRowView.swift */,
 				B5376A622B8BD7E5007B3A7A /* ChatSessionContentView.swift */,
 				B5376A6C2B8CC908007B3A7A /* GDPRView.swift */,
@@ -200,7 +197,6 @@
 				B5376A5F2B8BD79C007B3A7A /* ChatSession.swift in Sources */,
 				B5376A732B8D3D53007B3A7A /* ChatListRowView.swift in Sources */,
 				B5376A672B8BD825007B3A7A /* ChatTitleView.swift in Sources */,
-				B5376A612B8BD7BB007B3A7A /* ChatsListView.swift in Sources */,
 				B5376A632B8BD7E5007B3A7A /* ChatSessionContentView.swift in Sources */,
 				B5376A6F2B8CDD07007B3A7A /* Message.swift in Sources */,
 				B5927D9D2BAB9D7D00464C6B /* ChatSettings.swift in Sources */,

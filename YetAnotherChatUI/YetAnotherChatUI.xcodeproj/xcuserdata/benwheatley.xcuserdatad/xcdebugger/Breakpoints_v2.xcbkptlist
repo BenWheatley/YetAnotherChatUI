@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "0DACAF37-C29F-4D74-B283-FCB64EA6324E"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "DA36AC6A-F139-4A4D-96DB-319E2D7633BC"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "YetAnotherChatUI/Models/ChatSettings.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "66"
+            endingLineNumber = "66"
+            landmarkName = "init(from:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9E8403B6-172E-4A1F-8DA9-47EA99C8301A"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "YetAnotherChatUI/Views/ChatSessionView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "103"
+            endingLineNumber = "103"
+            landmarkName = "importData()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "9E8403B6-172E-4A1F-8DA9-47EA99C8301A - e1576bc3d50fa9f1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (__C.NSModalResponse) -&gt; () in YetAnotherChatUI.ChatSessionView.importData() -&gt; ()"
+                  moduleName = "YetAnotherChatUI"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/benwheatley/Documents/Personal/Projects/Code/YetAnotherChatUI/YetAnotherChatUI/YetAnotherChatUI/Views/ChatSessionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "102"
+                  endingLineNumber = "102">
+               </Location>
+               <Location
+                  uuid = "9E8403B6-172E-4A1F-8DA9-47EA99C8301A - 112ceac1ce7a8e0f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (YetAnotherChatUI.ChatSession) -&gt; () in closure #1 (__C.NSModalResponse) -&gt; () in YetAnotherChatUI.ChatSessionView.importData() -&gt; ()"
+                  moduleName = "YetAnotherChatUI"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/benwheatley/Documents/Personal/Projects/Code/YetAnotherChatUI/YetAnotherChatUI/YetAnotherChatUI/Views/ChatSessionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "103"
+                  endingLineNumber = "103">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4DE19DF5-8C4C-4ABF-8EB0-DB6970C3E7F9"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "YetAnotherChatUI/Views/ChatSessionView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "108"
+            endingLineNumber = "108"
+            landmarkName = "importData()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6EFBC97B-9F3A-4BA0-B8C1-576004202C48"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "YetAnotherChatUI/Views/ChatSessionView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "113"
+            endingLineNumber = "113"
+            landmarkName = "importData()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1B715DBB-188E-4205-92D6-C45E6B01AD09"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "YetAnotherChatUI/Views/ChatSessionView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "98"
+            endingLineNumber = "98"
+            landmarkName = "importData()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

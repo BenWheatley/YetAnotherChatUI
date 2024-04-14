@@ -11,17 +11,44 @@ import SwiftData
 import SwiftUI
 
 struct ChatSessionView: View {
-	@Query(sort: \ChatSession.lastModified) var listOfChats: [ChatSession]
+	@Query(sort: \ChatSession.lastModified, order: .reverse) var listOfChats: [ChatSession]
 
+	@State private var selectedChat: ChatSession?
 	@State private var isSettingsVisible = false
 	
 	@Environment(\.modelContext) private var swiftDataModelContext
 	
 	var body: some View {
-		NavigationView {
-			Section(header: Text("My chats")) {
-				ChatsListView()
+		NavigationSplitView {
+			VStack {
+				Text("My chats")
+					.font(.title)
+				
+				HStack {
+					Button(action: importData, label: {
+						Image(systemName: "square.and.arrow.down.on.square")
+							.padding(5)
+					}).padding()
+					
+					Spacer()
+					
+					Button(action: exportData, label: {
+						Image(systemName: "square.and.arrow.up.on.square")
+							.padding(5)
+					}).padding()
+				}
+				
+				List(listOfChats, selection: $selectedChat) { chat in
+					ChatListRowView(chat: chat)
+						.onTapGesture {
+							chat.lastModified = .now
+							selectedChat = chat
+						}
+				}
+				.navigationSplitViewColumnWidth(240)
 			}
+			
+		} detail: {
 			Section {
 				let mostRecentlyEditedChat = listOfChats.first ?? makeNewChatSession()
 				ChatSessionContentView(viewModel: mostRecentlyEditedChat)
@@ -46,8 +73,8 @@ struct ChatSessionView: View {
 			}
 		}
 		.sheet(isPresented: $isSettingsVisible) {
-			if let mostRecentlyEditedChat = listOfChats.first {
-				SettingsView(settings: mostRecentlyEditedChat.settings)
+			if let selectedChat = selectedChat {
+				SettingsView(settings: selectedChat.settings)
 			}
 		}
 	}
@@ -56,6 +83,53 @@ struct ChatSessionView: View {
 		let chatSession = ChatSession(chatTitle: "New chat", messages: [], settings: .savedSettings)
 		swiftDataModelContext.insert(chatSession)
 		return chatSession
+	}
+	
+	func importData() {
+		let importPanel = NSOpenPanel()
+		importPanel.allowedContentTypes = [.json]
+		importPanel.canChooseFiles = true
+		importPanel.canChooseDirectories = false
+		
+		importPanel.begin { response in
+			guard response == .OK, let url = importPanel.url else { return }
+			
+			do {
+				let data = try Data(contentsOf: url)
+				let decoder = JSONDecoder()
+				// TODO: both blocks fail on sample data
+				if let importedChats = try? decoder.decode([ChatSession].self, from: data) {
+					print("importedChats count: \(importedChats.count)")
+					importedChats.forEach { c in
+						print(c.chatTitle)
+						swiftDataModelContext.insert(c)
+					}
+				} else if let importedChat = try? decoder.decode(ChatSession.self, from: data) {
+					print(importedChat.chatTitle)
+					swiftDataModelContext.insert(importedChat)
+				}
+				
+			} catch {
+				print("Error importing data: \(error.localizedDescription)")
+			}
+		}
+	}
+	
+	func exportData() {
+		let exportPanel = NSSavePanel()
+		exportPanel.allowedContentTypes = [.json]
+		
+		exportPanel.begin { response in
+			guard response == .OK, let url = exportPanel.url else { return }
+			
+			do {
+				let encoder = JSONEncoder()
+				let data = try encoder.encode(self.listOfChats)
+				try data.write(to: url)
+			} catch {
+				print("Error exporting data: \(error.localizedDescription)")
+			}
+		}
 	}
 }
 

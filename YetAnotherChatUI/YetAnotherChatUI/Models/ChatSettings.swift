@@ -39,15 +39,15 @@ class ChatSettings: ObservableObject, Codable {
 		return saved ?? defaultSettings
 	}
 	
-	required init(apiEndpoint: String, model: String, temperature: Float, maxTokens: Int, topP: Float, frequencyPenalty: Float, presencePenalty: Float, systemMessage: String) {
+	required init(apiEndpoint: String, model: String, temperature: Float?, maxTokens: Int?, topP: Float?, frequencyPenalty: Float?, presencePenalty: Float?, systemMessage: String?) {
 		self.apiEndpoint = apiEndpoint
 		self.model = model
-		self.temperature = temperature
-		self.maxTokens = maxTokens
-		self.topP = topP
-		self.frequencyPenalty = frequencyPenalty
-		self.presencePenalty = presencePenalty
-		self.systemMessage = systemMessage
+		self.temperature = temperature ?? 1
+		self.maxTokens = maxTokens ?? 2048
+		self.topP = topP ?? 1
+		self.frequencyPenalty = frequencyPenalty ?? 0
+		self.presencePenalty = presencePenalty ?? 0
+		self.systemMessage = systemMessage ?? ""
 	}
 	
 	func encode(to encoder: Encoder) throws {
