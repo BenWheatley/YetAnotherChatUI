@@ -57,6 +57,10 @@
 			border-radius: 5px;
 		}
 		
+		#exportLink {
+			display: hidden;
+		}
+		
 		#showHideChatsListButtonImage::before {
 			content: "‖";
 			font-size: 30px;
@@ -385,7 +389,15 @@
 	<div id="outer-chats-container">
 		<div id="inner-chats-container">
 			<h2>Chats (stored locally)</h2>
-			<button id="startNewChat" onClick="startNewChat();">Start new chat</button>
+			<div style="margin-bottom: 4px;">
+				<button id="startNewChat" onClick="startNewChat();">📄 Start new chat</button>
+			</div>
+			<div>
+				<button onClick="exportAll();">💾 Export all</button>
+				<input type="file" id="fileInput" multiple style="display: none;" onchange="importChatsAction(event.target.files);">
+				<button accept="application/json" onClick="_doc.id('fileInput').click();">📥 Import</button>
+				<a style="display: none;" id="exportLink"></a>
+			</div>
 			<!-- List of chats (left column) will be populated dynamically -->
 			<table id="chats">
 			</table>
@@ -1006,6 +1018,45 @@
 		
 		function scrollToBottom() {
 			_doc.id("chatSession").scrollTop = chatSession.scrollHeight;
+		}
+		
+		function importChatsAction(files) {
+			for (let i = 0; i < files.length; i++) {
+				importChatFromFile(files[i]);
+			}
+		}
+		
+		function importChatFromFile(file) {
+			const reader = new FileReader();
+			
+			reader.onload = function(event) {
+				const importedChats = JSON.parse(event.target.result).filter(chatJSON => {
+					try {
+						ChatObject.createFromJson(chatJSON);
+						return true;
+					} catch (e) {
+						console.error("Invalid chat format:", chatJSON);
+						return false;
+					}
+				});
+				
+				// Merge new content into local storage
+				const existingChats = loadAndConvertAllChats();
+				const mergedChats = [...existingChats, ...importedChats];
+				localStorage.setItem('chats', JSON.stringify(mergedChats));
+				
+				// Refresh chat list
+				renderChatsList();
+			};
+			
+			reader.readAsText(file);
+		}
+		
+		function exportAll() {
+			var exportLink = _doc.id("exportLink");
+			exportLink.href = URL.createObjectURL(new Blob([localStorage.chats], {type: 'application/json'}));
+			exportLink.download = 'exported-chats.json';
+			exportLink.click();
 		}
 		
 		class _doc {
