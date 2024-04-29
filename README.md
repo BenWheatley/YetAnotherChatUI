@@ -8,7 +8,7 @@ Motivation: I personally want a pay-as-you-go version of ChatGPT 4 rather than a
 
 ## Core versions
 
-# Web
+### Web
 
 Single-page JavaScript app: https://benwheatley.github.io/YetAnotherChatUI/
 
@@ -18,7 +18,7 @@ I've noticed from using this app, that sometimes the storage system (localStorag
 
 Also serves as a way for me to learn more about JavaScript.
 
-# SwiftUI
+### SwiftUI
 
 In order of where I will be spending my energy:
 
