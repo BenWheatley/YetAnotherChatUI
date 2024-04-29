@@ -63,6 +63,34 @@
                   startingLineNumber = "103"
                   endingLineNumber = "103">
                </Location>
+               <Location
+                  uuid = "9E8403B6-172E-4A1F-8DA9-47EA99C8301A - e1576bc3d50faa10"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (__C.NSModalResponse) -&gt; () in YetAnotherChatUI.ChatSessionView.importData() -&gt; ()"
+                  moduleName = "YetAnotherChatUI"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/benwheatley/Documents/Personal/Projects/Code/YetAnotherChatUI/YetAnotherChatUI/YetAnotherChatUI/Views/ChatSessionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "103"
+                  endingLineNumber = "103">
+               </Location>
+               <Location
+                  uuid = "9E8403B6-172E-4A1F-8DA9-47EA99C8301A - 112ceac1ce7a8e2c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (YetAnotherChatUI.ChatSession) -&gt; () in closure #1 (__C.NSModalResponse) -&gt; () in YetAnotherChatUI.ChatSessionView.importData() -&gt; ()"
+                  moduleName = "YetAnotherChatUI"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/benwheatley/Documents/Personal/Projects/Code/YetAnotherChatUI/YetAnotherChatUI/YetAnotherChatUI/Views/ChatSessionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "104"
+                  endingLineNumber = "104">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
