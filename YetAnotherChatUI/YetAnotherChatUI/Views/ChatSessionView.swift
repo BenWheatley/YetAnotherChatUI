@@ -97,16 +97,11 @@ struct ChatSessionView: View {
 			do {
 				let data = try Data(contentsOf: url)
 				let decoder = JSONDecoder()
-				// TODO: both blocks fail on sample data
-				if let importedChats = try? decoder.decode([ChatSession].self, from: data) {
-					print("importedChats count: \(importedChats.count)")
-					importedChats.forEach { c in
-						print(c.chatTitle)
-						swiftDataModelContext.insert(c)
-					}
-				} else if let importedChat = try? decoder.decode(ChatSession.self, from: data) {
-					print(importedChat.chatTitle)
-					swiftDataModelContext.insert(importedChat)
+				let importedFromWeb = try decoder.decode(WebChats.self, from: data)
+				let appChats = importedFromWeb.convertToAppModel()
+				appChats.forEach { c in
+					print(c.chatTitle)
+					swiftDataModelContext.insert(c)
 				}
 				
 			} catch {
@@ -124,7 +119,7 @@ struct ChatSessionView: View {
 			
 			do {
 				let encoder = JSONEncoder()
-				let data = try encoder.encode(self.listOfChats)
+				let data = try encoder.encode(WebChats(source: self.listOfChats))
 				try data.write(to: url)
 			} catch {
 				print("Error exporting data: \(error.localizedDescription)")
