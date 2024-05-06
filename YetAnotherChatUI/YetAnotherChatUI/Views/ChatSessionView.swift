@@ -100,7 +100,6 @@ struct ChatSessionView: View {
 				let importedFromWeb = try decoder.decode(WebChats.self, from: data)
 				let appChats = importedFromWeb.convertToAppModel()
 				appChats.forEach { c in
-					print(c.chatTitle)
 					swiftDataModelContext.insert(c)
 				}
 				
